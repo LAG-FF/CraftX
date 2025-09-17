@@ -8,9 +8,11 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: url("assets/app_module_mob.jpg") no-repeat center center fixed;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             background-size: cover;
+            background-attachment: fixed;
             color: #fff;
+            min-height: 100vh;
         }
 
         .app {
@@ -59,10 +61,14 @@
             background: rgba(0,0,0,0.4);
             font-size: 14px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         .tab.active {
             background: rgba(255,255,255,0.2);
             font-weight: bold;
+        }
+        .tab:hover {
+            background: rgba(255,255,255,0.25);
         }
 
         /* Card */
@@ -71,6 +77,7 @@
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .title {
             text-align: center;
@@ -87,6 +94,13 @@
             justify-content: center;
             font-size: 14px;
             margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
         }
         .card-footer {
             display: flex;
@@ -109,6 +123,10 @@
             border-radius: 14px;
             cursor: pointer;
             color: #fff;
+            transition: all 0.3s ease;
+        }
+        .read-more:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         /* Pagination */
@@ -124,10 +142,14 @@
             border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
+            transition: all 0.3s ease;
         }
         .page.active {
             background: rgba(255,255,255,0.2);
             font-weight: bold;
+        }
+        .page:hover {
+            background: rgba(255,255,255,0.25);
         }
         
         /* Instructions */
@@ -142,11 +164,43 @@
         .instructions h3 {
             margin-top: 0;
             color: #4CAF50;
+            border-bottom: 1px solid #4CAF50;
+            padding-bottom: 8px;
         }
         .instructions code {
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
+            display: block;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .file-structure {
+            background: rgba(0,0,0,0.8);
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .file-structure div {
+            padding: 2px 0;
+            font-family: monospace;
+        }
+        .folder {
+            color: #4CAF50;
+        }
+        .file {
+            color: #64B5F6;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
@@ -169,7 +223,10 @@
         <!-- Card -->
         <div class="card">
             <div class="title">MAP NAME</div>
-            <div class="preview">IMAGE WILL SHOW HERE</div>
+            <div class="preview">
+                <div>IMAGE WILL SHOW HERE</div>
+                <img class="preview-img" src="" alt="Preview">
+            </div>
             <div class="card-footer">
                 <div class="user-badge">😁 User111</div>
                 <button class="read-more">Read More</button>
@@ -187,22 +244,78 @@
         
         <!-- Instructions -->
         <div class="instructions">
-            <h3>Deployment Instructions:</h3>
-            <p>1. Create an <code>assets</code> folder in your project directory</p>
-            <p>2. Place your images in the assets folder</p>
-            <p>3. Create a <code>package.json</code> file with the following content:</p>
-            <code>
-            {<br>
-            &nbsp;&nbsp;"name": "craftx-website",<br>
-            &nbsp;&nbsp;"version": "1.0.0",<br>
-            &nbsp;&nbsp;"scripts": {<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;"vercel-build": "echo 'No build step needed for static site'"<br>
-            &nbsp;&nbsp;},<br>
-            &nbsp;&nbsp;"devDependencies": {}<br>
-            }
-            </code>
-            <p>4. Deploy to Vercel using their GitHub integration or CLI</p>
+            <h3>Vercel Deployment Instructions:</h3>
+            <p>To fix the 404 error, you need to create the following files:</p>
+            
+            <div class="file-structure">
+                <div class="folder">📁 your-project/</div>
+                <div class="file">   📄 index.html (this file)</div>
+                <div class="file">   📄 package.json</div>
+                <div class="file">   📄 vercel.json</div>
+                <div class="folder">   📁 assets/</div>
+                <div class="file">      📄 app_module_mob.jpg</div>
+                <div class="file">      📄 preview-image.jpg</div>
+            </div>
+            
+            <p><strong>1. package.json</strong> - Create this file in your project root:</p>
+            <code>{
+  "name": "craftx-website",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "echo 'No dev script needed'",
+    "build": "echo 'No build step required for static site'",
+    "vercel-build": "echo 'No build step required for static site'"
+  },
+  "devDependencies": {}
+}</code>
+            
+            <p><strong>2. vercel.json</strong> - Create this file to configure Vercel:</p>
+            <code>{
+  "version": 2,
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "(.*)",
+      "dest": "/$1"
+    }
+  ]
+}</code>
+            
+            <p><strong>3. Folder Structure</strong> - Make sure you have an assets folder with your images</p>
+            
+            <p><strong>4. Deployment</strong> - Drag and drop your project folder to the Vercel dashboard or connect your GitHub repository.</p>
+        </div>
+        
+        <div class="footer">
+            CraftX UI | Designed for Vercel Deployment
         </div>
     </div>
+
+    <script>
+        // Simple tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+        
+        // Simple pagination functionality
+        document.querySelectorAll('.page').forEach(page => {
+            page.addEventListener('click', () => {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                page.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
