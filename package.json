@@ -1,14 +1,8 @@
 {
   "name": "craftx-website",
   "version": "1.0.0",
-  "description": "Minimal UI for CraftX",
   "scripts": {
-    "dev": "npx serve public"
+    "vercel-build": "echo 'No build step needed for static site'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "serve": "^14.2.0"
-  }
+  "devDependencies": {}
 }
