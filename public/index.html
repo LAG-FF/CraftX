@@ -1,171 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CraftX — Minimal UI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraftX — Minimal UI</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url("assets/app_module_mob.jpg") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("/assets/app_module_mob.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-    }
+        .app {
+            max-width: 420px;
+            margin: auto;
+            padding: 16px;
+        }
 
-    .app {
-      max-width: 420px;
-      margin: auto;
-      padding: 16px;
-    }
+        /* Top bar */
+        .top {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .search-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
 
-    /* Top bar */
-    .top {
-      background: rgba(0,0,0,0.5);
-      border-radius: 20px;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .brand {
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .search-btn {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.4);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: bold;
+        }
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 8px;
-      border-radius: 16px;
-      background: rgba(0,0,0,0.4);
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .tab.active {
-      background: rgba(255,255,255,0.2);
-      font-weight: bold;
-    }
+        /* Card */
+        .card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .preview {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 12px;
+            border-radius: 14px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .read-more {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            color: #fff;
+        }
 
-    /* Card */
-    .card {
-      background: rgba(0,0,0,0.5);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-    .title {
-      text-align: center;
-      margin-bottom: 12px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .preview {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .user-badge {
-      background: rgba(255,255,255,0.15);
-      padding: 6px 12px;
-      border-radius: 14px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .read-more {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      padding: 6px 12px;
-      border-radius: 14px;
-      cursor: pointer;
-      color: #fff;
-    }
-
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-    }
-    .page {
-      background: rgba(0,0,0,0.4);
-      padding: 6px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .page.active {
-      background: rgba(255,255,255,0.2);
-      font-weight: bold;
-    }
-  </style>
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .page {
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .page.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: bold;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: rgba(0,0,0,0.7);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 30px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .instructions code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Top bar -->
-    <div class="top">
-      <div class="brand">CraftX</div>
-      <button class="search-btn">🔍</button>
-    </div>
+    <div class="app">
+        <!-- Top bar -->
+        <div class="top">
+            <div class="brand">CraftX</div>
+            <button class="search-btn">🔍</button>
+        </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active">Maps</div>
-      <div class="tab">Assets</div>
-      <div class="tab">Tools</div>
-      <div class="tab">Others</div>
-    </div>
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active">Maps</div>
+            <div class="tab">Assets</div>
+            <div class="tab">Tools</div>
+            <div class="tab">Others</div>
+        </div>
 
-    <!-- Card -->
-    <div class="card">
-      <div class="title">MAP NAME</div>
-      <div class="preview">IMAGE WILL SHOW HERE</div>
-      <div class="card-footer">
-        <div class="user-badge">😁 User111</div>
-        <button class="read-more">Read More</button>
-      </div>
-    </div>
+        <!-- Card -->
+        <div class="card">
+            <div class="title">MAP NAME</div>
+            <div class="preview">IMAGE WILL SHOW HERE</div>
+            <div class="card-footer">
+                <div class="user-badge">😁 User111</div>
+                <button class="read-more">Read More</button>
+            </div>
+        </div>
 
-    <!-- Pagination -->
-    <div class="pagination">
-      <div class="page active">1</div>
-      <div class="page">2</div>
-      <div class="page">3</div>
-      <div class="page">4</div>
-      <div class="page">...</div>
+        <!-- Pagination -->
+        <div class="pagination">
+            <div class="page active">1</div>
+            <div class="page">2</div>
+            <div class="page">3</div>
+            <div class="page">4</div>
+            <div class="page">...</div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>Deployment Instructions:</h3>
+            <p>1. Create an <code>assets</code> folder in your project directory</p>
+            <p>2. Place your images in the assets folder</p>
+            <p>3. Create a <code>package.json</code> file with the following content:</p>
+            <code>
+            {<br>
+            &nbsp;&nbsp;"name": "craftx-website",<br>
+            &nbsp;&nbsp;"version": "1.0.0",<br>
+            &nbsp;&nbsp;"scripts": {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"vercel-build": "echo 'No build step needed for static site'"<br>
+            &nbsp;&nbsp;},<br>
+            &nbsp;&nbsp;"devDependencies": {}<br>
+            }
+            </code>
+            <p>4. Deploy to Vercel using their GitHub integration or CLI</p>
+        </div>
     </div>
-  </div>
 </body>
-  </html>
+</html>
