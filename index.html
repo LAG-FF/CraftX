@@ -88,42 +88,26 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .title {
-            text-align: center;
-            margin-bottom: 12px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .preview {
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-        .preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-        .card-footer {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
         }
         .user-badge {
             background: rgba(255,255,255,0.15);
-            padding: 6px 12px;
-            border-radius: 14px;
-            font-size: 14px;
+            padding: 6px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        .user-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
         }
         .share-btn {
             background: rgba(255,255,255,0.2);
@@ -144,6 +128,28 @@
         .share-icon {
             width: 20px;
             height: 20px;
+        }
+        .preview {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
         }
 
         .pagination {
@@ -173,7 +179,7 @@
     <div class="app">
         <div class="top">
             <div class="brand">
-                <img class="logo" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/LAG-FF.jpg" alt="CraftX Logo">
+                <img class="logo" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/CraftX.png" alt="CraftX Logo">
                 CraftX
             </div>
             <button class="search-btn">
@@ -189,17 +195,21 @@
         </div>
 
         <div class="card">
-            <div class="title">MAP NAME</div>
-            <div class="preview">
-                <div>IMAGE WILL SHOW HERE</div>
-                <img class="preview-img" src="" alt="Preview">
-            </div>
-            <div class="card-footer">
-                <div class="user-badge">😁</div>
+            <div class="card-header">
+                <div class="user-badge">
+                    <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="User">
+                </div>
                 <button class="share-btn">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
                 </button>
             </div>
+            
+            <div class="preview">
+                <div>IMAGE WILL SHOW HERE</div>
+                <img class="preview-img" src="" alt="Preview">
+            </div>
+            
+            <div class="title">MAP NAME</div>
         </div>
 
         <div class="pagination">
