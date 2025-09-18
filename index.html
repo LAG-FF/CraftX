@@ -8,9 +8,8 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: url("https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/BG.jpg") no-repeat center center fixed;
             background-size: cover;
-            background-attachment: fixed;
             color: #fff;
             min-height: 100vh;
         }
@@ -21,7 +20,6 @@
             padding: 16px;
         }
 
-        /* Top bar */
         .top {
             background: rgba(0,0,0,0.5);
             border-radius: 20px;
@@ -34,6 +32,15 @@
         .brand {
             font-size: 22px;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
         }
         .search-btn {
             background: rgba(255,255,255,0.15);
@@ -46,8 +53,11 @@
             justify-content: center;
             cursor: pointer;
         }
+        .search-icon {
+            width: 20px;
+            height: 20px;
+        }
 
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 8px;
@@ -71,7 +81,6 @@
             background: rgba(255,255,255,0.25);
         }
 
-        /* Card */
         .card {
             background: rgba(0,0,0,0.5);
             border-radius: 16px;
@@ -116,20 +125,27 @@
             align-items: center;
             gap: 6px;
         }
-        .read-more {
+        .share-btn {
             background: rgba(255,255,255,0.2);
             border: none;
-            padding: 6px 12px;
+            padding: 6px;
             border-radius: 14px;
             cursor: pointer;
-            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
             transition: all 0.3s ease;
         }
-        .read-more:hover {
+        .share-btn:hover {
             background: rgba(255,255,255,0.3);
         }
+        .share-icon {
+            width: 20px;
+            height: 20px;
+        }
 
-        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -151,68 +167,20 @@
         .page:hover {
             background: rgba(255,255,255,0.25);
         }
-        
-        /* Instructions */
-        .instructions {
-            background: rgba(0,0,0,0.7);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: 30px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .instructions h3 {
-            margin-top: 0;
-            color: #4CAF50;
-            border-bottom: 1px solid #4CAF50;
-            padding-bottom: 8px;
-        }
-        .instructions code {
-            background: rgba(255,255,255,0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: block;
-            margin: 10px 0;
-            white-space: pre-wrap;
-            font-family: monospace;
-        }
-        .file-structure {
-            background: rgba(0,0,0,0.8);
-            border-left: 4px solid #4CAF50;
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .file-structure div {
-            padding: 2px 0;
-            font-family: monospace;
-        }
-        .folder {
-            color: #4CAF50;
-        }
-        .file {
-            color: #64B5F6;
-        }
-        
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-        }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Top bar -->
         <div class="top">
-            <div class="brand">CraftX</div>
-            <button class="search-btn">🔍</button>
+            <div class="brand">
+                <img class="logo" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/LAG-FF.jpg" alt="CraftX Logo">
+                CraftX
+            </div>
+            <button class="search-btn">
+                <img class="search-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png" alt="Search">
+            </button>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <div class="tab active">Maps</div>
             <div class="tab">Assets</div>
@@ -220,7 +188,6 @@
             <div class="tab">Others</div>
         </div>
 
-        <!-- Card -->
         <div class="card">
             <div class="title">MAP NAME</div>
             <div class="preview">
@@ -228,12 +195,13 @@
                 <img class="preview-img" src="" alt="Preview">
             </div>
             <div class="card-footer">
-                <div class="user-badge">😁 User111</div>
-                <button class="read-more">Read More</button>
+                <div class="user-badge">😁</div>
+                <button class="share-btn">
+                    <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
+                </button>
             </div>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination">
             <div class="page active">1</div>
             <div class="page">2</div>
@@ -241,67 +209,9 @@
             <div class="page">4</div>
             <div class="page">...</div>
         </div>
-        
-        <!-- Instructions -->
-        <div class="instructions">
-            <h3>Vercel Deployment Instructions:</h3>
-            <p>To fix the 404 error, you need to create the following files:</p>
-            
-            <div class="file-structure">
-                <div class="folder">📁 your-project/</div>
-                <div class="file">   📄 index.html (this file)</div>
-                <div class="file">   📄 package.json</div>
-                <div class="file">   📄 vercel.json</div>
-                <div class="folder">   📁 assets/</div>
-                <div class="file">      📄 app_module_mob.jpg</div>
-                <div class="file">      📄 preview-image.jpg</div>
-            </div>
-            
-            <p><strong>1. package.json</strong> - Create this file in your project root:</p>
-            <code>{
-  "name": "craftx-website",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "echo 'No dev script needed'",
-    "build": "echo 'No build step required for static site'",
-    "vercel-build": "echo 'No build step required for static site'"
-  },
-  "devDependencies": {}
-}</code>
-            
-            <p><strong>2. vercel.json</strong> - Create this file to configure Vercel:</p>
-            <code>{
-  "version": 2,
-  "builds": [
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/*",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "(.*)",
-      "dest": "/$1"
-    }
-  ]
-}</code>
-            
-            <p><strong>3. Folder Structure</strong> - Make sure you have an assets folder with your images</p>
-            
-            <p><strong>4. Deployment</strong> - Drag and drop your project folder to the Vercel dashboard or connect your GitHub repository.</p>
-        </div>
-        
-        <div class="footer">
-            CraftX UI | Designed for Vercel Deployment
-        </div>
     </div>
 
     <script>
-        // Simple tab functionality
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -309,7 +219,6 @@
             });
         });
         
-        // Simple pagination functionality
         document.querySelectorAll('.page').forEach(page => {
             page.addEventListener('click', () => {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
