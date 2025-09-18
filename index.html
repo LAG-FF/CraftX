@@ -96,24 +96,25 @@
         }
         .user-badge {
             background: rgba(255,255,255,0.15);
-            padding: 6px;
-            border-radius: 50%;
+            padding: 6px 12px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
+            gap: 8px;
         }
         .user-icon {
-            width: 20px;
-            height: 20px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
+            object-fit: cover;
+        }
+        .user-name {
+            font-size: 14px;
         }
         .share-btn {
             background: rgba(255,255,255,0.2);
             border: none;
-            padding: 6px;
-            border-radius: 14px;
+            border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -198,6 +199,7 @@
             <div class="card-header">
                 <div class="user-badge">
                     <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="User">
+                    <span class="user-name">User123</span>
                 </div>
                 <button class="share-btn">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
