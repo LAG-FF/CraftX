@@ -4,16 +4,18 @@
     {
       "src": "*.html",
       "use": "@vercel/static"
-    },
-    {
-      "src": "assets/*",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "(.*)",
       "dest": "/$1"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
