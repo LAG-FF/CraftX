@@ -7,17 +7,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
-        <div class="top">
-            <div class="brand">
-                <img class="logo" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/CraftX.png" alt="CraftX Logo">
-                CraftX
-            </div>
-            <button class="search-btn">
+    <div class="top floating">
+        <div class="brand">
+            <img class="logo" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/CraftX.png" alt="CraftX Logo">
+            CraftX
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by name or description...">
+            <button class="search-btn" id="searchBtn">
                 <img class="search-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png" alt="Search">
             </button>
         </div>
+    </div>
 
+    <div class="app">
         <div class="tabs">
             <div class="tab active" data-type="map">Maps</div>
             <div class="tab" data-type="asset">Assets</div>
