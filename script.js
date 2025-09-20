@@ -2,12 +2,16 @@
 let currentType = 'map';
 let currentData = [];
 let teamData = [];
+let filteredData = [];
+let isSearching = false;
 
 // DOM elements
 const contentEl = document.getElementById('content');
 const detailViewEl = document.getElementById('detailView');
 const detailContentEl = document.getElementById('detailContent');
 const tabs = document.querySelectorAll('.tab');
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
 
 // CORS proxy server
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -32,6 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.classList.add('active');
             const type = tab.getAttribute('data-type');
             currentType = type;
+            isSearching = false;
+            searchInput.value = '';
+            searchInput.classList.remove('active');
+            searchBtn.classList.remove('active');
             loadContent(type);
         });
     });
@@ -40,6 +48,54 @@ document.addEventListener('DOMContentLoaded', () => {
     detailViewEl.addEventListener('click', (e) => {
         if (e.target === detailViewEl) {
             closeDetailView();
+        }
+    });
+
+    // Search functionality
+    searchBtn.addEventListener('click', () => {
+        searchInput.classList.toggle('active');
+        searchBtn.classList.toggle('active');
+        
+        if (!searchInput.classList.contains('active')) {
+            // Reset search
+            isSearching = false;
+            searchInput.value = '';
+            renderItems(currentData.filter(item => item.visible !== false), currentType);
+        } else {
+            searchInput.focus();
+        }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        
+        if (searchTerm.length === 0) {
+            isSearching = false;
+            renderItems(currentData.filter(item => item.visible !== false), currentType);
+            return;
+        }
+        
+        isSearching = true;
+        filteredData = currentData.filter(item => {
+            if (item.visible === false) return false;
+            
+            const nameMatch = item.name && item.name.toLowerCase().includes(searchTerm);
+            const descMatch = item.description && item.description.toLowerCase().includes(searchTerm);
+            
+            return nameMatch || descMatch;
+        });
+        
+        renderItems(filteredData, currentType);
+    });
+
+    // Handle escape key to close search
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && searchInput.classList.contains('active')) {
+            searchInput.classList.remove('active');
+            searchBtn.classList.remove('active');
+            isSearching = false;
+            searchInput.value = '';
+            renderItems(currentData.filter(item => item.visible !== false), currentType);
         }
     });
 });
@@ -213,6 +269,11 @@ async function loadContent(type) {
 function renderItems(items, type) {
     contentEl.innerHTML = '';
     
+    if (items.length === 0) {
+        contentEl.innerHTML = `<div class="empty">No results found for your search.</div>`;
+        return;
+    }
+    
     items.forEach(item => {
         const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
         
@@ -258,7 +319,8 @@ function showDetailView(item, type) {
             item.map_code_ind.forEach(code => {
                 buttonsHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        📋 ${code.name}: ${code.code}
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" class="action-icon" alt="Copy"> 
+                        ${code.name}: ${code.code}
                     </button>
                 `;
             });
@@ -268,24 +330,38 @@ function showDetailView(item, type) {
             item.map_code_other.forEach(code => {
                 buttonsHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        📋 ${code.name}: ${code.code}
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" class="action-icon" alt="Copy"> 
+                        ${code.name}: ${code.code}
                     </button>
                 `;
             });
+        }
+    } else if (type === 'team') {
+        // Team social links
+        if (item.social_links && item.social_links.length > 0) {
+            buttonsHTML += `<div class="team-social">`;
+            item.social_links.forEach(link => {
+                buttonsHTML += `
+                    <a href="${link.url}" target="_blank" class="social-link">${link.platform}</a>
+                `;
+            });
+            buttonsHTML += `</div>`;
         }
     } else if (item.button_links && item.button_links.length > 0) {
         // Other button links
         item.button_links.forEach(link => {
             if (link.type === 'download file') {
                 buttonsHTML += `
-                    <button class="action-btn link-btn" onclick="window.open('${link.url}', '_self')">
-                        ⬇️ ${link.label}
+                    <button class="action-btn download-btn" onclick="window.open('${link.url}', '_self')">
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Download.png" class="action-icon" alt="Download"> 
+                        ${link.label}
                     </button>
                 `;
             } else {
                 buttonsHTML += `
                     <button class="action-btn link-btn" onclick="window.open('${link.url}', '_blank')">
-                        🔗 ${link.label}
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Link.png" class="action-icon" alt="Link"> 
+                        ${link.label}
                     </button>
                 `;
             }
@@ -296,7 +372,8 @@ function showDetailView(item, type) {
     if (item.youtube_url) {
         buttonsHTML = `
             <button class="action-btn youtube-btn" onclick="window.open('${item.youtube_url}', '_blank')">
-                ▶️ Watch on YouTube
+                <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/YouTube.png" class="action-icon" alt="YouTube"> 
+                Watch on YouTube
             </button>
         ` + buttonsHTML;
     }
@@ -312,6 +389,12 @@ function showDetailView(item, type) {
         </div>
         <div class="action-buttons">
             ${buttonsHTML || '<p>No actions available</p>'}
+        </div>
+        <div class="detail-share">
+            <button class="detail-share-btn" onclick="shareItem('${type}', ${item.id})">
+                <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
+                Share
+            </button>
         </div>
     `;
     
