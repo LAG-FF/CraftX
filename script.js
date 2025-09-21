@@ -259,6 +259,9 @@ function showDetailView(item, type) {
     }
     
     detailContentEl.innerHTML = `
+        <button class="close-detail-btn" onclick="closeDetailView()">
+            <img class="close-btn-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png" alt="Close">
+        </button>
         <button class="close-btn" onclick="closeDetailView()">×</button>
         <div class="detail-header">
             <div class="user-badge" onclick="openUserUrl('${creator.url || ''}')">
