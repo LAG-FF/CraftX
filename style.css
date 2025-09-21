@@ -5,6 +5,7 @@ body {
     background-size: cover;
     color: #fff;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .app {
@@ -22,6 +23,7 @@ body {
     align-items: center;
     margin-bottom: 16px;
     position: relative;
+    transition: all 0.3s ease;
 }
 .brand {
     font-size: 22px;
@@ -29,7 +31,9 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    opacity: 1;
+    width: auto;
 }
 .brand.hidden {
     opacity: 0;
@@ -41,6 +45,10 @@ body {
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.logo:hover {
+    transform: scale(1.1);
 }
 .search-container {
     display: flex;
@@ -62,7 +70,7 @@ body {
     right: 50px;
 }
 .search-input.active {
-    width: calc(100% - 100px);
+    width: calc(100% - 120px);
     opacity: 1;
     position: static;
 }
@@ -77,10 +85,16 @@ body {
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+.search-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: scale(1.1);
 }
 .search-icon {
     width: 20px;
     height: 20px;
+    transition: transform 0.3s ease;
 }
 
 .tabs {
@@ -109,9 +123,11 @@ body {
 .tab.active {
     background: rgba(255,255,255,0.2);
     font-weight: bold;
+    transform: scale(1.05);
 }
 .tab:hover {
     background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
 }
 
 .card {
@@ -121,10 +137,12 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease;
 }
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
 }
 .card-header {
     display: flex;
@@ -142,10 +160,11 @@ body {
     max-width: 70%;
     overflow: hidden;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 .user-badge:hover {
     background: rgba(255,255,255,0.25);
+    transform: scale(1.05);
 }
 .user-icon {
     width: 32px;
@@ -153,6 +172,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
 }
 .user-name {
     font-size: 14px;
@@ -175,6 +195,7 @@ body {
 }
 .share-btn:hover {
     background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
 }
 .share-icon {
     width: 20px;
@@ -190,11 +211,19 @@ body {
     font-size: 14px;
     margin-bottom: 12px;
     overflow: hidden;
+    transition: all 0.3s ease;
+}
+.preview:hover {
+    transform: scale(1.02);
 }
 .preview-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.preview-img:hover {
+    transform: scale(1.05);
 }
 .title {
     text-align: center;
@@ -204,6 +233,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    transition: all 0.3s ease;
 }
 .description {
     display: none;
@@ -226,9 +256,11 @@ body {
 .page.active {
     background: rgba(255,255,255,0.2);
     font-weight: bold;
+    transform: scale(1.1);
 }
 .page:hover {
     background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
 }
 
 .detail-view {
@@ -238,20 +270,47 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.95);
     z-index: 1000;
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
+    animation: fadeIn 0.3s ease;
 }
 .detail-content {
     max-width: 500px;
     margin: 40px auto;
-    background: rgba(30,30,30,0.95);
-    border-radius: 16px;
-    padding: 20px;
+    background: rgba(30,30,30,0.98);
+    border-radius: 20px;
+    padding: 25px;
     position: relative;
     box-sizing: border-box;
+    animation: slideUp 0.4s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+.close-detail-btn {
+    position: absolute;
+    top: 15px;
+    right: 60px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+.close-detail-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+.close-btn-icon {
+    width: 20px;
+    height: 20px;
 }
 .close-btn {
     position: absolute;
@@ -260,63 +319,82 @@ body {
     background: rgba(255,255,255,0.2);
     border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1001;
+    transition: all 0.3s ease;
+}
+.close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
 }
 .detail-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 .detail-image {
     width: 100%;
-    border-radius: 12px;
-    margin-bottom: 15px;
+    border-radius: 16px;
+    margin-bottom: 20px;
     max-height: 300px;
     object-fit: contain;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+.detail-image:hover {
+    transform: scale(1.02);
 }
 .detail-title {
-    font-size: 24px;
+    font-size: 26px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     word-break: break-word;
+    font-weight: bold;
+    animation: fadeIn 0.5s ease;
 }
 .detail-description {
     font-size: 16px;
-    margin-bottom: 20px;
-    line-height: 1.5;
+    margin-bottom: 25px;
+    line-height: 1.6;
     word-break: break-word;
     text-align: center;
+    padding: 0 10px;
+    animation: fadeIn 0.6s ease;
 }
 .action-buttons {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 25px;
+    animation: fadeIn 0.7s ease;
 }
 .action-btn {
-    padding: 12px;
-    border-radius: 8px;
+    padding: 14px;
+    border-radius: 10px;
     border: none;
     font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     transition: all 0.3s ease;
 }
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
 .action-btn img {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
 }
 .youtube-btn {
     background: #ff0000;
@@ -341,20 +419,55 @@ body {
 }
 .loading {
     text-align: center;
-    padding: 20px;
+    padding: 40px 20px;
     font-size: 18px;
+    animation: pulse 1.5s infinite;
 }
 .error {
     text-align: center;
-    padding: 20px;
+    padding: 40px 20px;
     color: #ff6b6b;
     font-size: 18px;
+    animation: shake 0.5s ease;
 }
 .empty {
     text-align: center;
-    padding: 40px 20px;
+    padding: 60px 20px;
     font-size: 16px;
     opacity: 0.7;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
 }
 
 @media (max-width: 480px) {
@@ -368,19 +481,22 @@ body {
     }
     .detail-content {
         margin: 20px auto;
-        padding: 15px;
+        padding: 20px;
     }
     .detail-title {
-        font-size: 20px;
+        font-size: 22px;
     }
     .detail-description {
         font-size: 14px;
     }
     .action-btn {
         font-size: 14px;
-        padding: 10px;
+        padding: 12px;
     }
     .search-input.active {
-        width: calc(100% - 90px);
+        width: calc(100% - 100px);
+    }
+    .close-detail-btn {
+        right: 50px;
     }
 }
