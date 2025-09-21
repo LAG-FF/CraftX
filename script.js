@@ -1,3 +1,4 @@
+// Global variables
 let currentType = 'map';
 let currentData = [];
 let teamData = [];
@@ -5,6 +6,7 @@ let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
 
+// DOM elements
 const contentEl = document.getElementById('content');
 const detailViewEl = document.getElementById('detailView');
 const detailContentEl = document.getElementById('detailContent');
@@ -13,43 +15,47 @@ const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
 
+// CORS proxy server
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
 
-searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
-        searchQuery = e.target.value;
-        filterContent();
-    }
-});
-
-searchBtn.addEventListener('click', () => {
-    isSearchActive = !isSearchActive;
-    
-    if (isSearchActive) {
-        searchInput.classList.add('active');
-        searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
-        searchInput.focus();
-    } else {
-        searchInput.classList.remove('active');
-        searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
-        searchQuery = '';
-        searchInput.value = '';
-        filterContent();
-    }
-});
-
+// Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    // Load team data first
+    // Set up search functionality
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            searchQuery = e.target.value;
+            filterContent();
+        }
+    });
+
+    searchBtn.addEventListener('click', () => {
+        isSearchActive = !isSearchActive;
+        
+        if (isSearchActive) {
+            searchInput.classList.add('active');
+            searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
+            searchInput.focus();
+        } else {
+            searchInput.classList.remove('active');
+            searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
+            searchQuery = '';
+            searchInput.value = '';
+            filterContent();
+        }
+    });
+
+    // Load team data first (for creator names)
     fetchData('team').then(data => {
         teamData = data.team || [];
-        // Then load initial content
+        // Load initial content (maps)
         loadContent('map');
     }).catch(error => {
         console.error('Error loading team data:', error);
-        // Load initial content even if team data fails
-        loadContent('map');
+        contentEl.innerHTML = `<div class="error">Failed to load data. Please try again later.</div>`;
     });
 
+    // Set up tab click events
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
@@ -65,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Close detail view when clicking outside
     detailViewEl.addEventListener('click', (e) => {
         if (e.target === detailViewEl) {
             closeDetailView();
@@ -72,41 +79,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Fetch data from API with CORS proxy
 async function fetchData(type) {
     try {
-        // Try without headers first
-        const response = await fetch(API_BASE + type);
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log(`Fetched ${type}:`, data);
-            return data;
+        // Try direct fetch first
+        try {
+            const response = await fetch(API_BASE + type, {
+                headers: {
+                    'X-View-Key': 'keyview'
+                }
+            });
+
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (directError) {
+            console.log('Direct fetch failed, trying with CORS proxy:', directError);
         }
-        
-        // If that fails, try with headers
-        const responseWithHeaders = await fetch(API_BASE + type, {
+
+        // If direct fetch fails, use CORS proxy
+        const response = await fetch(CORS_PROXY + API_BASE + type, {
             headers: {
-                'X-View-Key': 'keyview'
+                'X-View-Key': 'keyview',
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
-        if (responseWithHeaders.ok) {
-            const data = await responseWithHeaders.json();
-            console.log(`Fetched ${type} with headers:`, data);
-            return data;
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        throw new Error(`HTTP error! status: ${response.status}`);
+
+        return await response.json();
     } catch (error) {
         console.error('Error fetching data:', error);
         
-        // Return sample data if API fails
-        return getSampleData(type);
+        // Fallback to mock data if API fails
+        return getMockData(type);
     }
 }
 
-function getSampleData(type) {
-    const sampleData = {
+// Mock data for fallback
+function getMockData(type) {
+    const mockData = {
         team: {
             team: [
                 {
@@ -204,9 +218,10 @@ function getSampleData(type) {
         }
     };
     
-    return sampleData[type] || {[type]: []};
+    return mockData[type] || {[type]: []};
 }
 
+// Load content based on type
 async function loadContent(type) {
     contentEl.innerHTML = `<div class="loading">Loading ${type} content...</div>`;
 
@@ -214,23 +229,21 @@ async function loadContent(type) {
         const data = await fetchData(type);
         allData[type] = data[type] || [];
         currentData = allData[type];
+        
         filterContent();
     } catch (error) {
-        console.error('Error loading content:', error);
         contentEl.innerHTML = `<div class="error">Failed to load ${type} content. Please try again later.</div>`;
     }
 }
 
 function filterContent() {
-    let visibleItems = currentData.filter(item => item && (item.visible === undefined || item.visible !== false));
+    let visibleItems = currentData.filter(item => item.visible !== false);
     
     if (searchQuery) {
         const query = searchQuery.toLowerCase();
         visibleItems = visibleItems.filter(item => 
-            item && (
-                (item.name && item.name.toLowerCase().includes(query)) ||
-                (item.description && item.description.toLowerCase().includes(query))
-            )
+            (item.name && item.name.toLowerCase().includes(query)) ||
+            (item.description && item.description.toLowerCase().includes(query))
         );
     }
     
@@ -242,12 +255,11 @@ function filterContent() {
     renderItems(visibleItems, currentType);
 }
 
+// Render items to the content area
 function renderItems(items, type) {
     contentEl.innerHTML = '';
     
     items.forEach(item => {
-        if (!item) return;
-        
         const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
         
         const card = document.createElement('div');
@@ -262,17 +274,17 @@ function renderItems(items, type) {
                     <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
                     <span class="user-name">${creator.name || 'Unknown'}</span>
                 </div>
-                <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id || 0})">
+                <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id})">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
                 </button>
             </div>
             
             <div class="preview">
-                <img class="preview-img" src="${item.img_url || ''}" alt="${item.name || 'No name'}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img class="preview-img" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div style="display: ${item.img_url ? 'none' : 'flex'}; align-items: center; justify-content: center;">IMAGE NOT AVAILABLE</div>
             </div>
             
-            <div class="title">${item.name || 'Untitled'}</div>
+            <div class="title">${item.name}</div>
             <div class="description">${item.description || 'No description available'}</div>
         `;
         
@@ -280,12 +292,14 @@ function renderItems(items, type) {
     });
 }
 
+// Show detail view for an item
 function showDetailView(item, type) {
     const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
     
     let buttonsHTML = '';
     
     if (type === 'map' || type === 'asset') {
+        // Map and asset codes
         if (item.map_code_ind && item.map_code_ind.length > 0) {
             item.map_code_ind.forEach(code => {
                 buttonsHTML += `
@@ -306,6 +320,7 @@ function showDetailView(item, type) {
             });
         }
     } else if (item.button_links && item.button_links.length > 0) {
+        // Other button links
         item.button_links.forEach(link => {
             if (link.type === 'download file') {
                 buttonsHTML += `
@@ -323,6 +338,7 @@ function showDetailView(item, type) {
         });
     }
     
+    // YouTube button if available
     if (item.youtube_url) {
         buttonsHTML = `
             <button class="action-btn youtube-btn" onclick="window.open('${item.youtube_url}', '_blank')">
@@ -338,12 +354,12 @@ function showDetailView(item, type) {
                 <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
                 <span class="user-name">Created by: ${creator.name || 'Unknown'}</span>
             </div>
-            <button class="share-btn" onclick="shareItem('${type}', ${item.id || 0})">
+            <button class="share-btn" onclick="shareItem('${type}', ${item.id})">
                 <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
             </button>
         </div>
-        <img class="detail-image" src="${item.img_url || ''}" alt="${item.name || 'No name'}" onerror="this.style.display='none'">
-        <div class="detail-title">${item.name || 'Untitled'}</div>
+        <img class="detail-image" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'">
+        <div class="detail-title">${item.name}</div>
         <div class="detail-description">${item.description || 'No description available'}</div>
         <div class="action-buttons">
             ${buttonsHTML || '<p>No actions available</p>'}
@@ -354,11 +370,13 @@ function showDetailView(item, type) {
     document.body.style.overflow = 'hidden';
 }
 
+// Close detail view
 function closeDetailView() {
     detailViewEl.style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
+// Copy text to clipboard
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         alert('Copied to clipboard: ' + text);
@@ -367,6 +385,7 @@ function copyToClipboard(text) {
     });
 }
 
+// Share item URL
 function shareItem(type, id) {
     const url = `${window.location.origin}${window.location.pathname}#${type}/${id}`;
     
@@ -376,6 +395,7 @@ function shareItem(type, id) {
             url: url
         }).catch(console.error);
     } else {
+        // Fallback for browsers that don't support Web Share API
         navigator.clipboard.writeText(url).then(() => {
             alert('Link copied to clipboard!');
         }).catch(err => {
@@ -385,6 +405,7 @@ function shareItem(type, id) {
     }
 }
 
+// Handle URL hash changes for direct links
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     const parts = hash.split('/');
@@ -393,13 +414,15 @@ window.addEventListener('hashchange', () => {
         const type = parts[0];
         const id = parseInt(parts[1]);
         
+        // Find the tab with this type and click it
         const tab = document.querySelector(`.tab[data-type="${type}"]`);
         if (tab) {
             tab.click();
             
+            // After content loads, find the item and show its detail
             setTimeout(() => {
-                const item = currentData.find(item => item && item.id === id);
-                if (item && (item.visible === undefined || item.visible !== false)) {
+                const item = currentData.find(item => item.id === id);
+                if (item && item.visible !== false) {
                     showDetailView(item, type);
                 }
             }, 500);
@@ -407,6 +430,7 @@ window.addEventListener('hashchange', () => {
     }
 });
 
+// Check for hash on page load
 window.addEventListener('load', () => {
     const hash = window.location.hash.substring(1);
     const parts = hash.split('/');
@@ -415,24 +439,25 @@ window.addEventListener('load', () => {
         const type = parts[0];
         const id = parseInt(parts[1]);
         
-        // Load team data first, then the specific content
+        // Load the team data first, then the content type
         fetchData('team').then(data => {
             teamData = data.team || [];
             
+            // Find the tab with this type and click it
             const tab = document.querySelector(`.tab[data-type="${type}"]`);
             if (tab) {
                 tab.click();
                 
-                setTimeout(() => {
-                    fetchData(type).then(data => {
-                        currentData = data[type] || [];
-                        
-                        const item = currentData.find(item => item && item.id === id);
-                        if (item && (item.visible === undefined || item.visible !== false)) {
-                            showDetailView(item, type);
-                        }
-                    });
-                }, 500);
+                // Load the specific content type
+                fetchData(type).then(data => {
+                    currentData = data[type] || [];
+                    
+                    // Find the item and show its detail
+                    const item = currentData.find(item => item.id === id);
+                    if (item && item.visible !== false) {
+                        showDetailView(item, type);
+                    }
+                });
             }
         });
     }
