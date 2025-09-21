@@ -1,5 +1,6 @@
 let currentType = 'map';
 let currentData = [];
+let teamData = [];
 let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
@@ -38,7 +39,15 @@ searchBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadContent('map');
+    // Load team data first
+    fetchData('team').then(data => {
+        teamData = data.team || [];
+        // Then load initial content
+        loadContent('map');
+    }).catch(error => {
+        console.error('Error loading team data:', error);
+        loadContent('map');
+    });
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -77,24 +86,6 @@ async function fetchData(type) {
         throw new Error(`HTTP error! status: ${response.status}`);
     } catch (error) {
         console.error('Error fetching data:', error);
-        
-        // Try alternative API endpoint format
-        try {
-            const response = await fetch(API_BASE, {
-                headers: {
-                    'X-View-Key': 'keyview',
-                    'X-Data-Type': type
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                return data;
-            }
-        } catch (secondError) {
-            console.error('Second attempt failed:', secondError);
-        }
-        
         return {[type]: []};
     }
 }
@@ -104,7 +95,7 @@ async function loadContent(type) {
 
     try {
         const data = await fetchData(type);
-        allData[type] = data[type] || data || [];
+        allData[type] = data[type] || [];
         currentData = allData[type];
         filterContent();
     } catch (error) {
@@ -140,6 +131,8 @@ function renderItems(items, type) {
     items.forEach(item => {
         if (!item) return;
         
+        const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
+        
         const card = document.createElement('div');
         card.className = 'card';
         card.addEventListener('click', () => {
@@ -149,8 +142,8 @@ function renderItems(items, type) {
         card.innerHTML = `
             <div class="card-header">
                 <div class="user-badge">
-                    <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
-                    <span class="user-name">Unknown</span>
+                    <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                    <span class="user-name">${creator.name || 'Unknown'}</span>
                 </div>
                 <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id || 0})">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
@@ -171,6 +164,8 @@ function renderItems(items, type) {
 }
 
 function showDetailView(item, type) {
+    const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
+    
     let buttonsHTML = '';
     
     if (type === 'map' || type === 'asset') {
@@ -223,8 +218,8 @@ function showDetailView(item, type) {
         <button class="close-btn" onclick="closeDetailView()">×</button>
         <div class="detail-header">
             <div class="user-badge">
-                <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
-                <span class="user-name">Created by: Unknown</span>
+                <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                <span class="user-name">Created by: ${creator.name || 'Unknown'}</span>
             </div>
             <button class="share-btn" onclick="shareItem('${type}', ${item.id || 0})">
                 <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
@@ -303,20 +298,25 @@ window.addEventListener('load', () => {
         const type = parts[0];
         const id = parseInt(parts[1]);
         
-        const tab = document.querySelector(`.tab[data-type="${type}"]`);
-        if (tab) {
-            tab.click();
+        // Load team data first, then the specific content
+        fetchData('team').then(data => {
+            teamData = data.team || [];
             
-            setTimeout(() => {
-                fetchData(type).then(data => {
-                    currentData = data[type] || data || [];
-                    
-                    const item = currentData.find(item => item && item.id === id);
-                    if (item && (item.visible === undefined || item.visible !== false)) {
-                        showDetailView(item, type);
-                    }
-                });
-            }, 500);
-        }
+            const tab = document.querySelector(`.tab[data-type="${type}"]`);
+            if (tab) {
+                tab.click();
+                
+                setTimeout(() => {
+                    fetchData(type).then(data => {
+                        currentData = data[type] || [];
+                        
+                        const item = currentData.find(item => item && item.id === id);
+                        if (item && (item.visible === undefined || item.visible !== false)) {
+                            showDetailView(item, type);
+                        }
+                    });
+                }, 500);
+            }
+        });
     }
 });
