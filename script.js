@@ -14,6 +14,7 @@ const tabs = document.querySelectorAll('.tab');
 const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
+const brand = document.querySelector('.brand');
 
 // CORS proxy server
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -34,10 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isSearchActive) {
             searchInput.classList.add('active');
+            brand.classList.add('hidden');
             searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
             searchInput.focus();
         } else {
             searchInput.classList.remove('active');
+            brand.classList.remove('hidden');
             searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
             searchQuery = '';
             searchInput.value = '';
@@ -113,112 +116,9 @@ async function fetchData(type) {
     } catch (error) {
         console.error('Error fetching data:', error);
         
-        // Fallback to mock data if API fails
-        return getMockData(type);
+        // Return empty data if API fails
+        return {[type]: []};
     }
-}
-
-// Mock data for fallback
-function getMockData(type) {
-    const mockData = {
-        team: {
-            team: [
-                {
-                    id: 0,
-                    visible: true,
-                    name: "LAG FF",
-                    description: "A short bio about the team member",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/LAG-FF.jpg",
-                    social_links: [
-                        {
-                            platform: "YouTube",
-                            url: "https://youtube.com/@lag_ff_yt"
-                        }
-                    ]
-                }
-            ]
-        },
-        map: {
-            map: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Map",
-                    description: "This is a sample map description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    map_code_ind: [
-                        {
-                            name: "India Standard Edition",
-                            code: "IND-MAP-001"
-                        }
-                    ]
-                }
-            ]
-        },
-        asset: {
-            asset: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Asset",
-                    description: "This is a sample asset description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    map_code_ind: [
-                        {
-                            name: "India Standard Edition",
-                            code: "IND-ASSET-001"
-                        }
-                    ]
-                }
-            ]
-        },
-        tool: {
-            tool: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Tool",
-                    description: "This is a sample tool description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    button_links: [
-                        {
-                            type: "download file",
-                            label: "Download Tool",
-                            url: "https://example.com/tool.zip"
-                        }
-                    ]
-                }
-            ]
-        },
-        other: {
-            other: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Other",
-                    description: "This is a sample other content description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    button_links: [
-                        {
-                            type: "link",
-                            label: "Visit Website",
-                            url: "https://example.com"
-                        }
-                    ]
-                }
-            ]
-        }
-    };
-    
-    return mockData[type] || {[type]: []};
 }
 
 // Load content based on type
@@ -270,7 +170,7 @@ function renderItems(items, type) {
         
         card.innerHTML = `
             <div class="card-header">
-                <div class="user-badge">
+                <div class="user-badge" onclick="event.stopPropagation(); openUserUrl('${creator.url || ''}')">
                     <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
                     <span class="user-name">${creator.name || 'Unknown'}</span>
                 </div>
@@ -285,11 +185,22 @@ function renderItems(items, type) {
             </div>
             
             <div class="title">${item.name}</div>
-            <div class="description">${item.description || 'No description available'}</div>
         `;
         
         contentEl.appendChild(card);
     });
+}
+
+// Open user URL
+function openUserUrl(url) {
+    if (url && url.trim() !== '') {
+        // Add https:// if not present
+        let fullUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            fullUrl = 'https://' + url;
+        }
+        window.open(fullUrl, '_self');
+    }
 }
 
 // Show detail view for an item
@@ -350,9 +261,9 @@ function showDetailView(item, type) {
     detailContentEl.innerHTML = `
         <button class="close-btn" onclick="closeDetailView()">×</button>
         <div class="detail-header">
-            <div class="user-badge">
+            <div class="user-badge" onclick="openUserUrl('${creator.url || ''}')">
                 <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
-                <span class="user-name">Created by: ${creator.name || 'Unknown'}</span>
+                <span class="user-name">${creator.name || 'Unknown'}</span>
             </div>
             <button class="share-btn" onclick="shareItem('${type}', ${item.id})">
                 <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
