@@ -5,6 +5,7 @@ let teamData = [];
 let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
+let lastScrollPosition = 0;
 
 // DOM elements
 const contentEl = document.getElementById('content');
@@ -15,6 +16,15 @@ const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
 const brand = document.querySelector('.brand');
+const scrollHelper = document.createElement('div');
+
+// Create scroll helper element
+scrollHelper.className = 'scroll-helper';
+scrollHelper.innerHTML = '<img class="scroll-helper-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Scroll.png" alt="Scroll">';
+scrollHelper.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.body.appendChild(scrollHelper);
 
 // CORS proxy server
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
@@ -22,6 +32,9 @@ const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
+    // Set up scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
     // Set up search functionality
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
@@ -35,12 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isSearchActive) {
             searchInput.classList.add('active');
-            brand.classList.add('hidden');
             searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
             searchInput.focus();
         } else {
             searchInput.classList.remove('active');
-            brand.classList.remove('hidden');
             searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
             searchQuery = '';
             searchInput.value = '';
@@ -81,6 +92,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Handle scroll events
+function handleScroll() {
+    const currentScrollPosition = window.pageYOffset;
+    
+    // Show/hide scroll helper
+    if (currentScrollPosition > 300) {
+        scrollHelper.classList.add('visible');
+    } else {
+        scrollHelper.classList.remove('visible');
+    }
+    
+    // Animate cards on scroll
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        const cardPosition = card.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.3;
+        
+        if (cardPosition < screenPosition) {
+            card.classList.add('visible');
+            
+            // Add direction-based animation
+            if (currentScrollPosition > lastScrollPosition) {
+                card.style.animation = 'slideInFromBottom 0.5s ease forwards';
+            } else {
+                card.style.animation = 'slideInFromTop 0.5s ease forwards';
+            }
+        }
+    });
+    
+    lastScrollPosition = currentScrollPosition;
+}
 
 // Fetch data from API with CORS proxy
 async function fetchData(type) {
@@ -159,11 +202,12 @@ function filterContent() {
 function renderItems(items, type) {
     contentEl.innerHTML = '';
     
-    items.forEach(item => {
+    items.forEach((item, index) => {
         const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
         
         const card = document.createElement('div');
         card.className = 'card';
+        card.style.animationDelay = `${index * 0.1}s`;
         card.addEventListener('click', () => {
             showDetailView(item, type);
         });
@@ -189,6 +233,11 @@ function renderItems(items, type) {
         
         contentEl.appendChild(card);
     });
+    
+    // Trigger scroll event to animate cards
+    setTimeout(() => {
+        handleScroll();
+    }, 100);
 }
 
 // Open user URL
@@ -262,7 +311,6 @@ function showDetailView(item, type) {
         <button class="close-detail-btn" onclick="closeDetailView()">
             <img class="close-btn-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png" alt="Close">
         </button>
-        <button class="close-btn" onclick="closeDetailView()">×</button>
         <div class="detail-header">
             <div class="user-badge" onclick="openUserUrl('${creator.url || ''}')">
                 <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
