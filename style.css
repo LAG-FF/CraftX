@@ -35,8 +35,6 @@ body::before {
     align-items: center;
     margin-bottom: 16px;
     position: relative;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 .brand {
     font-size: 22px;
@@ -44,24 +42,12 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: all 0.3s ease;
-    opacity: 1;
-    width: auto;
-}
-.brand.hidden {
-    opacity: 0;
-    width: 0;
-    overflow: hidden;
 }
 .logo {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    transition: transform 0.3s ease;
-}
-.logo:hover {
-    transform: scale(1.1);
 }
 .search-container {
     display: flex;
@@ -81,7 +67,6 @@ body::before {
     transition: all 0.3s ease;
     position: absolute;
     right: 50px;
-    backdrop-filter: blur(5px);
 }
 .search-input.active {
     width: calc(100% - 120px);
@@ -99,17 +84,10 @@ body::before {
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-.search-btn:hover {
-    background: rgba(255,255,255,0.25);
-    transform: scale(1.1);
 }
 .search-icon {
     width: 20px;
     height: 20px;
-    transition: transform 0.3s ease;
 }
 
 .tabs {
@@ -134,16 +112,13 @@ body::before {
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
-    backdrop-filter: blur(5px);
 }
 .tab.active {
     background: rgba(255,255,255,0.25);
     font-weight: bold;
-    transform: scale(1.05);
 }
 .tab:hover {
     background: rgba(255,255,255,0.3);
-    transform: translateY(-2px);
 }
 
 .card {
@@ -153,19 +128,16 @@ body::before {
     margin-bottom: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     cursor: pointer;
-    transition: all 0.3s ease;
-    animation: fadeIn 0.5s ease;
-    backdrop-filter: blur(5px);
-    opacity: 0;
     transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .card.visible {
     opacity: 1;
     transform: translateY(0);
 }
 .card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    transform: translateY(-5px);
 }
 .card-header {
     display: flex;
@@ -183,12 +155,6 @@ body::before {
     max-width: 70%;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-.user-badge:hover {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.05);
 }
 .user-icon {
     width: 32px;
@@ -196,7 +162,6 @@ body::before {
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
-    transition: transform 0.3s ease;
 }
 .user-name {
     font-size: 14px;
@@ -214,13 +179,7 @@ body::before {
     justify-content: center;
     width: 36px;
     height: 36px;
-    transition: all 0.3s ease;
     flex-shrink: 0;
-    backdrop-filter: blur(5px);
-}
-.share-btn:hover {
-    background: rgba(255,255,255,0.35);
-    transform: scale(1.1);
 }
 .share-icon {
     width: 20px;
@@ -236,20 +195,11 @@ body::before {
     font-size: 14px;
     margin-bottom: 12px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-.preview:hover {
-    transform: scale(1.02);
 }
 .preview-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
-}
-.preview-img:hover {
-    transform: scale(1.05);
 }
 .title {
     text-align: center;
@@ -259,10 +209,6 @@ body::before {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: all 0.3s ease;
-}
-.description {
-    display: none;
 }
 
 .pagination {
@@ -277,17 +223,10 @@ body::before {
     border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
 }
 .page.active {
     background: rgba(255,255,255,0.25);
     font-weight: bold;
-    transform: scale(1.1);
-}
-.page:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-2px);
 }
 
 .detail-view {
@@ -302,7 +241,6 @@ body::before {
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
-    animation: fadeIn 0.3s ease;
 }
 .detail-content {
     max-width: 500px;
@@ -312,9 +250,6 @@ body::before {
     padding: 25px;
     position: relative;
     box-sizing: border-box;
-    animation: slideUp 0.4s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
 }
 .close-detail-btn {
     position: absolute;
@@ -330,12 +265,6 @@ body::before {
     align-items: center;
     justify-content: center;
     z-index: 1001;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-.close-detail-btn:hover {
-    background: rgba(255,255,255,0.35);
-    transform: scale(1.1);
 }
 .close-btn-icon {
     width: 20px;
@@ -353,11 +282,6 @@ body::before {
     margin-bottom: 20px;
     max-height: 300px;
     object-fit: contain;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: transform 0.3s ease;
-}
-.detail-image:hover {
-    transform: scale(1.02);
 }
 .detail-title {
     font-size: 26px;
@@ -365,7 +289,6 @@ body::before {
     margin-bottom: 15px;
     word-break: break-word;
     font-weight: bold;
-    animation: fadeIn 0.5s ease;
 }
 .detail-description {
     font-size: 16px;
@@ -374,14 +297,19 @@ body::before {
     word-break: break-word;
     text-align: center;
     padding: 0 10px;
-    animation: fadeIn 0.6s ease;
 }
 .action-buttons {
     display: flex;
     flex-direction: column;
     gap: 12px;
     margin-top: 25px;
-    animation: fadeIn 0.7s ease;
+}
+.code-section-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 15px 0 8px;
+    color: #fed403;
 }
 .action-btn {
     padding: 14px;
@@ -393,57 +321,41 @@ body::before {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
+    background: #fed403;
+    color: #000;
+    font-weight: bold;
 }
 .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    opacity: 0.9;
 }
 .action-btn img {
     width: 22px;
     height: 22px;
 }
 .youtube-btn {
-    background: rgba(255,0,0,0.8);
+    background: #ff0000;
     color: white;
-}
-.youtube-btn:hover {
-    background: rgba(204,0,0,0.9);
-}
-.code-btn {
-    background: rgba(76,175,80,0.8);
-    color: white;
-}
-.code-btn:hover {
-    background: rgba(62,142,65,0.9);
 }
 .link-btn {
-    background: rgba(33,150,243,0.8);
+    background: #2196F3;
     color: white;
-}
-.link-btn:hover {
-    background: rgba(11,125,218,0.9);
 }
 .loading {
     text-align: center;
     padding: 40px 20px;
     font-size: 18px;
-    animation: pulse 1.5s infinite;
 }
 .error {
     text-align: center;
     padding: 40px 20px;
     color: #ff6b6b;
     font-size: 18px;
-    animation: shake 0.5s ease;
 }
 .empty {
     text-align: center;
     padding: 60px 20px;
     font-size: 16px;
     opacity: 0.7;
-    animation: fadeIn 0.5s ease;
 }
 
 .scroll-helper {
@@ -460,73 +372,14 @@ body::before {
     cursor: pointer;
     z-index: 100;
     opacity: 0;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
 }
 .scroll-helper.visible {
     opacity: 1;
 }
-.scroll-helper:hover {
-    background: rgba(255,255,255,0.3);
-    transform: scale(1.1);
-}
 .scroll-helper-icon {
     width: 20px;
     height: 20px;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { 
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
-@keyframes shake {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-10px); }
-    80% { transform: translateX(10px); }
-    100% { transform: translateX(0); }
-}
-
-@keyframes slideInFromBottom {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInFromTop {
-    from {
-        opacity: 0;
-        transform: translateY(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 @media (max-width: 480px) {
