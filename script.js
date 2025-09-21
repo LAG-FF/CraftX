@@ -5,7 +5,7 @@ let teamData = [];
 let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
-let lastScrollPosition = 0;
+let scrollTimeout = null;
 
 // DOM elements
 const contentEl = document.getElementById('content');
@@ -15,7 +15,6 @@ const tabs = document.querySelectorAll('.tab');
 const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
-const brand = document.querySelector('.brand');
 const scrollHelper = document.createElement('div');
 
 // Create scroll helper element
@@ -32,8 +31,11 @@ const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    // Set up scroll event listener
-    window.addEventListener('scroll', handleScroll);
+    // Set up scroll event listener with debounce
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(handleScroll, 100);
+    });
     
     // Set up search functionality
     searchInput.addEventListener('keyup', (e) => {
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Handle scroll events
+// Handle scroll events with debounce
 function handleScroll() {
     const currentScrollPosition = window.pageYOffset;
     
@@ -104,25 +106,18 @@ function handleScroll() {
         scrollHelper.classList.remove('visible');
     }
     
-    // Animate cards on scroll
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
+    // Animate cards on scroll with optimized performance
+    const cards = document.querySelectorAll('.card:not(.visible)');
+    const screenPosition = window.innerHeight / 1.3;
+    
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
         const cardPosition = card.getBoundingClientRect().top;
-        const screenPosition = window.innerHeight / 1.3;
         
         if (cardPosition < screenPosition) {
             card.classList.add('visible');
-            
-            // Add direction-based animation
-            if (currentScrollPosition > lastScrollPosition) {
-                card.style.animation = 'slideInFromBottom 0.5s ease forwards';
-            } else {
-                card.style.animation = 'slideInFromTop 0.5s ease forwards';
-            }
         }
-    });
-    
-    lastScrollPosition = currentScrollPosition;
+    }
 }
 
 // Fetch data from API with CORS proxy
@@ -207,7 +202,7 @@ function renderItems(items, type) {
         
         const card = document.createElement('div');
         card.className = 'card';
-        card.style.animationDelay = `${index * 0.1}s`;
+        card.style.transitionDelay = `${index * 0.05}s`;
         card.addEventListener('click', () => {
             showDetailView(item, type);
         });
@@ -257,28 +252,35 @@ function showDetailView(item, type) {
     const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
     
     let buttonsHTML = '';
+    let indiaCodesHTML = '';
+    let otherCodesHTML = '';
     
     if (type === 'map' || type === 'asset') {
-        // Map and asset codes
+        // Map and asset codes for India
         if (item.map_code_ind && item.map_code_ind.length > 0) {
+            indiaCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For India Server' : 'Asset Code For India Server'}</div>`;
             item.map_code_ind.forEach(code => {
-                buttonsHTML += `
+                indiaCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}: ${code.code}
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}
                     </button>
                 `;
             });
         }
         
+        // Map and asset codes for Other regions
         if (item.map_code_other && item.map_code_other.length > 0) {
+            otherCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For Other Server' : 'Asset Code For Other Server'}</div>`;
             item.map_code_other.forEach(code => {
-                buttonsHTML += `
+                otherCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}: ${code.code}
+                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}
                     </button>
                 `;
             });
         }
+        
+        buttonsHTML = indiaCodesHTML + otherCodesHTML;
     } else if (item.button_links && item.button_links.length > 0) {
         // Other button links
         item.button_links.forEach(link => {
