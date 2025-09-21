@@ -1,6 +1,5 @@
 let currentType = 'map';
 let currentData = [];
-let teamData = [];
 let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
@@ -13,7 +12,6 @@ const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
 
-const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
 const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
 
 searchInput.addEventListener('keyup', (e) => {
@@ -73,28 +71,31 @@ async function fetchData(type) {
         });
 
         if (response.ok) {
-            return await response.json();
+            const data = await response.json();
+            return data;
         }
         throw new Error(`HTTP error! status: ${response.status}`);
-    } catch (directError) {
-        console.log('Direct fetch failed, trying with CORS proxy:', directError);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        
+        // Try alternative API endpoint format
         try {
-            const response = await fetch(CORS_PROXY + API_BASE + type, {
+            const response = await fetch(API_BASE, {
                 headers: {
                     'X-View-Key': 'keyview',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Data-Type': type
                 }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                return data;
             }
-
-            return await response.json();
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            return {[type]: []};
+        } catch (secondError) {
+            console.error('Second attempt failed:', secondError);
         }
+        
+        return {[type]: []};
     }
 }
 
@@ -103,22 +104,25 @@ async function loadContent(type) {
 
     try {
         const data = await fetchData(type);
-        allData[type] = data[type] || [];
+        allData[type] = data[type] || data || [];
         currentData = allData[type];
         filterContent();
     } catch (error) {
+        console.error('Error loading content:', error);
         contentEl.innerHTML = `<div class="error">Failed to load ${type} content. Please try again later.</div>`;
     }
 }
 
 function filterContent() {
-    let visibleItems = currentData.filter(item => item.visible !== false);
+    let visibleItems = currentData.filter(item => item && (item.visible === undefined || item.visible !== false));
     
     if (searchQuery) {
         const query = searchQuery.toLowerCase();
         visibleItems = visibleItems.filter(item => 
-            (item.name && item.name.toLowerCase().includes(query)) ||
-            (item.description && item.description.toLowerCase().includes(query))
+            item && (
+                (item.name && item.name.toLowerCase().includes(query)) ||
+                (item.description && item.description.toLowerCase().includes(query))
+            )
         );
     }
     
@@ -134,6 +138,8 @@ function renderItems(items, type) {
     contentEl.innerHTML = '';
     
     items.forEach(item => {
+        if (!item) return;
+        
         const card = document.createElement('div');
         card.className = 'card';
         card.addEventListener('click', () => {
@@ -146,17 +152,17 @@ function renderItems(items, type) {
                     <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
                     <span class="user-name">Unknown</span>
                 </div>
-                <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id})">
+                <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id || 0})">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
                 </button>
             </div>
             
             <div class="preview">
-                <img class="preview-img" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <img class="preview-img" src="${item.img_url || ''}" alt="${item.name || 'No name'}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div style="display: ${item.img_url ? 'none' : 'flex'}; align-items: center; justify-content: center;">IMAGE NOT AVAILABLE</div>
             </div>
             
-            <div class="title">${item.name}</div>
+            <div class="title">${item.name || 'Untitled'}</div>
             <div class="description">${item.description || 'No description available'}</div>
         `;
         
@@ -220,12 +226,12 @@ function showDetailView(item, type) {
                 <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
                 <span class="user-name">Created by: Unknown</span>
             </div>
-            <button class="share-btn" onclick="shareItem('${type}', ${item.id})">
+            <button class="share-btn" onclick="shareItem('${type}', ${item.id || 0})">
                 <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
             </button>
         </div>
-        <img class="detail-image" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'">
-        <div class="detail-title">${item.name}</div>
+        <img class="detail-image" src="${item.img_url || ''}" alt="${item.name || 'No name'}" onerror="this.style.display='none'">
+        <div class="detail-title">${item.name || 'Untitled'}</div>
         <div class="detail-description">${item.description || 'No description available'}</div>
         <div class="action-buttons">
             ${buttonsHTML || '<p>No actions available</p>'}
@@ -280,8 +286,8 @@ window.addEventListener('hashchange', () => {
             tab.click();
             
             setTimeout(() => {
-                const item = currentData.find(item => item.id === id);
-                if (item && item.visible !== false) {
+                const item = currentData.find(item => item && item.id === id);
+                if (item && (item.visible === undefined || item.visible !== false)) {
                     showDetailView(item, type);
                 }
             }, 500);
@@ -303,10 +309,10 @@ window.addEventListener('load', () => {
             
             setTimeout(() => {
                 fetchData(type).then(data => {
-                    currentData = data[type] || [];
+                    currentData = data[type] || data || [];
                     
-                    const item = currentData.find(item => item.id === id);
-                    if (item && item.visible !== false) {
+                    const item = currentData.find(item => item && item.id === id);
+                    if (item && (item.visible === undefined || item.visible !== false)) {
                         showDetailView(item, type);
                     }
                 });
