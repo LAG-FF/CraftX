@@ -3,17 +3,19 @@ let currentData = [];
 let teamData = [];
 let allData = {};
 let searchQuery = '';
+let isSearchActive = false;
 
 const contentEl = document.getElementById('content');
 const detailViewEl = document.getElementById('detailView');
 const detailContentEl = document.getElementById('detailContent');
 const tabs = document.querySelectorAll('.tab');
 const searchBtn = document.querySelector('.search-btn');
-const searchInput = document.createElement('input');
+const searchInput = document.querySelector('.search-input');
+const searchIcon = document.querySelector('.search-icon');
 
-searchInput.type = 'text';
-searchInput.placeholder = 'Search name or description...';
-searchInput.className = 'search-input';
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
+
 searchInput.addEventListener('keyup', (e) => {
     if (e.key === 'Enter') {
         searchQuery = e.target.value;
@@ -21,12 +23,16 @@ searchInput.addEventListener('keyup', (e) => {
     }
 });
 
-searchBtn.parentNode.insertBefore(searchInput, searchBtn);
 searchBtn.addEventListener('click', () => {
-    searchInput.classList.toggle('active');
-    if (searchInput.classList.contains('active')) {
+    isSearchActive = !isSearchActive;
+    
+    if (isSearchActive) {
+        searchInput.classList.add('active');
+        searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
         searchInput.focus();
     } else {
+        searchInput.classList.remove('active');
+        searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
         searchQuery = '';
         searchInput.value = '';
         filterContent();
@@ -34,13 +40,7 @@ searchBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchData('team').then(data => {
-        teamData = data.team || [];
-        loadContent('map');
-    }).catch(error => {
-        console.error('Error loading team data:', error);
-        contentEl.innerHTML = `<div class="error">Failed to load data. Please try again later.</div>`;
-    });
+    loadContent('map');
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -93,111 +93,9 @@ async function fetchData(type) {
             return await response.json();
         } catch (error) {
             console.error('Error fetching data:', error);
-            return getMockData(type);
+            return {[type]: []};
         }
     }
-}
-
-function getMockData(type) {
-    const mockData = {
-        team: {
-            team: [
-                {
-                    id: 0,
-                    visible: true,
-                    name: "LAG FF",
-                    description: "A short bio about the team member",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/LAG-FF.jpg",
-                    social_links: [
-                        {
-                            platform: "YouTube",
-                            url: "https://youtube.com/@lag_ff_yt"
-                        }
-                    ]
-                }
-            ]
-        },
-        map: {
-            map: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Map",
-                    description: "This is a sample map description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    map_code_ind: [
-                        {
-                            name: "India Standard Edition",
-                            code: "IND-MAP-001"
-                        }
-                    ]
-                }
-            ]
-        },
-        asset: {
-            asset: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Asset",
-                    description: "This is a sample asset description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    map_code_ind: [
-                        {
-                            name: "India Standard Edition",
-                            code: "IND-ASSET-001"
-                        }
-                    ]
-                }
-            ]
-        },
-        tool: {
-            tool: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Tool",
-                    description: "This is a sample tool description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    button_links: [
-                        {
-                            type: "download file",
-                            label: "Download Tool",
-                            url: "https://example.com/tool.zip"
-                        }
-                    ]
-                }
-            ]
-        },
-        other: {
-            other: [
-                {
-                    id: 0,
-                    visible: true,
-                    creator_id: 0,
-                    name: "Sample Other",
-                    description: "This is a sample other content description",
-                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
-                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
-                    button_links: [
-                        {
-                            type: "link",
-                            label: "Visit Website",
-                            url: "https://example.com"
-                        }
-                    ]
-                }
-            ]
-        }
-    };
-    
-    return mockData[type] || {[type]: []};
 }
 
 async function loadContent(type) {
@@ -236,8 +134,6 @@ function renderItems(items, type) {
     contentEl.innerHTML = '';
     
     items.forEach(item => {
-        const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
-        
         const card = document.createElement('div');
         card.className = 'card';
         card.addEventListener('click', () => {
@@ -247,8 +143,8 @@ function renderItems(items, type) {
         card.innerHTML = `
             <div class="card-header">
                 <div class="user-badge">
-                    <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
-                    <span class="user-name">${creator.name || 'Unknown'}</span>
+                    <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
+                    <span class="user-name">Unknown</span>
                 </div>
                 <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id})">
                     <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
@@ -269,8 +165,6 @@ function renderItems(items, type) {
 }
 
 function showDetailView(item, type) {
-    const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
-    
     let buttonsHTML = '';
     
     if (type === 'map' || type === 'asset') {
@@ -323,8 +217,8 @@ function showDetailView(item, type) {
         <button class="close-btn" onclick="closeDetailView()">×</button>
         <div class="detail-header">
             <div class="user-badge">
-                <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
-                <span class="user-name">Created by: ${creator.name || 'Unknown'}</span>
+                <img class="user-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png" alt="Unknown">
+                <span class="user-name">Created by: Unknown</span>
             </div>
             <button class="share-btn" onclick="shareItem('${type}', ${item.id})">
                 <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
@@ -403,13 +297,11 @@ window.addEventListener('load', () => {
         const type = parts[0];
         const id = parseInt(parts[1]);
         
-        fetchData('team').then(data => {
-            teamData = data.team || [];
+        const tab = document.querySelector(`.tab[data-type="${type}"]`);
+        if (tab) {
+            tab.click();
             
-            const tab = document.querySelector(`.tab[data-type="${type}"]`);
-            if (tab) {
-                tab.click();
-                
+            setTimeout(() => {
                 fetchData(type).then(data => {
                     currentData = data[type] || [];
                     
@@ -418,7 +310,7 @@ window.addEventListener('load', () => {
                         showDetailView(item, type);
                     }
                 });
-            }
-        });
+            }, 500);
+        }
     }
 });
