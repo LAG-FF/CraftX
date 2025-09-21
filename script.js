@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadContent('map');
     }).catch(error => {
         console.error('Error loading team data:', error);
+        // Load initial content even if team data fails
         loadContent('map');
     });
 
@@ -73,21 +74,137 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchData(type) {
     try {
-        const response = await fetch(API_BASE + type, {
+        // Try without headers first
+        const response = await fetch(API_BASE + type);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`Fetched ${type}:`, data);
+            return data;
+        }
+        
+        // If that fails, try with headers
+        const responseWithHeaders = await fetch(API_BASE + type, {
             headers: {
                 'X-View-Key': 'keyview'
             }
         });
-
-        if (response.ok) {
-            const data = await response.json();
+        
+        if (responseWithHeaders.ok) {
+            const data = await responseWithHeaders.json();
+            console.log(`Fetched ${type} with headers:`, data);
             return data;
         }
+        
         throw new Error(`HTTP error! status: ${response.status}`);
     } catch (error) {
         console.error('Error fetching data:', error);
-        return {[type]: []};
+        
+        // Return sample data if API fails
+        return getSampleData(type);
     }
+}
+
+function getSampleData(type) {
+    const sampleData = {
+        team: {
+            team: [
+                {
+                    id: 0,
+                    visible: true,
+                    name: "LAG FF",
+                    description: "A short bio about the team member",
+                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/LAG-FF.jpg",
+                    social_links: [
+                        {
+                            platform: "YouTube",
+                            url: "https://youtube.com/@lag_ff_yt"
+                        }
+                    ]
+                }
+            ]
+        },
+        map: {
+            map: [
+                {
+                    id: 0,
+                    visible: true,
+                    creator_id: 0,
+                    name: "Sample Map",
+                    description: "This is a sample map description",
+                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
+                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
+                    map_code_ind: [
+                        {
+                            name: "India Standard Edition",
+                            code: "IND-MAP-001"
+                        }
+                    ]
+                }
+            ]
+        },
+        asset: {
+            asset: [
+                {
+                    id: 0,
+                    visible: true,
+                    creator_id: 0,
+                    name: "Sample Asset",
+                    description: "This is a sample asset description",
+                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
+                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
+                    map_code_ind: [
+                        {
+                            name: "India Standard Edition",
+                            code: "IND-ASSET-001"
+                        }
+                    ]
+                }
+            ]
+        },
+        tool: {
+            tool: [
+                {
+                    id: 0,
+                    visible: true,
+                    creator_id: 0,
+                    name: "Sample Tool",
+                    description: "This is a sample tool description",
+                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
+                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
+                    button_links: [
+                        {
+                            type: "download file",
+                            label: "Download Tool",
+                            url: "https://example.com/tool.zip"
+                        }
+                    ]
+                }
+            ]
+        },
+        other: {
+            other: [
+                {
+                    id: 0,
+                    visible: true,
+                    creator_id: 0,
+                    name: "Sample Other",
+                    description: "This is a sample other content description",
+                    img_url: "https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Test%20Banner.png",
+                    youtube_url: "https://youtu.be/lJhnGCSPuVo",
+                    button_links: [
+                        {
+                            type: "link",
+                            label: "Visit Website",
+                            url: "https://example.com"
+                        }
+                    ]
+                }
+            ]
+        }
+    };
+    
+    return sampleData[type] || {[type]: []};
 }
 
 async function loadContent(type) {
