@@ -21,6 +21,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    position: relative;
 }
 .brand {
     font-size: 22px;
@@ -28,6 +29,12 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    transition: opacity 0.3s ease;
+}
+.brand.hidden {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
 }
 .logo {
     width: 32px;
@@ -39,6 +46,8 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex: 1;
+    justify-content: flex-end;
 }
 .search-input {
     background: rgba(255,255,255,0.15);
@@ -49,10 +58,13 @@ body {
     width: 0;
     opacity: 0;
     transition: all 0.3s ease;
+    position: absolute;
+    right: 50px;
 }
 .search-input.active {
-    width: 180px;
+    width: calc(100% - 100px);
     opacity: 1;
+    position: static;
 }
 .search-btn {
     background: rgba(255,255,255,0.15);
@@ -64,6 +76,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    flex-shrink: 0;
 }
 .search-icon {
     width: 20px;
@@ -128,6 +141,11 @@ body {
     gap: 8px;
     max-width: 70%;
     overflow: hidden;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.user-badge:hover {
+    background: rgba(255,255,255,0.25);
 }
 .user-icon {
     width: 32px;
@@ -188,13 +206,7 @@ body {
     white-space: nowrap;
 }
 .description {
-    font-size: 14px;
-    text-align: center;
-    opacity: 0.8;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    display: none;
 }
 
 .pagination {
@@ -282,6 +294,7 @@ body {
     margin-bottom: 20px;
     line-height: 1.5;
     word-break: break-word;
+    text-align: center;
 }
 .action-buttons {
     display: flex;
@@ -368,6 +381,6 @@ body {
         padding: 10px;
     }
     .search-input.active {
-        width: 150px;
+        width: calc(100% - 90px);
     }
 }
