@@ -1,11 +1,12 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: url("https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/BG.jpg") no-repeat center center fixed;
+    background: url("https://storage.craftx.site/f1/BG.jpg") no-repeat center center fixed;
     background-size: cover;
     color: #fff;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body::before {
@@ -16,7 +17,6 @@ body::before {
     width: 100%;
     height: 100%;
     background: inherit;
-    filter: brightness(0.7);
     z-index: -1;
 }
 
@@ -27,7 +27,7 @@ body::before {
 }
 
 .top {
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7);
     border-radius: 20px;
     padding: 10px 16px;
     display: flex;
@@ -42,6 +42,11 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+.brand:hover {
+    opacity: 0.8;
 }
 .logo {
     width: 32px;
@@ -57,7 +62,7 @@ body::before {
     justify-content: flex-end;
 }
 .search-input {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.2);
     border: none;
     border-radius: 20px;
     padding: 8px 15px;
@@ -74,7 +79,7 @@ body::before {
     position: static;
 }
 .search-btn {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.2);
     border: none;
     border-radius: 50%;
     width: 36px;
@@ -84,6 +89,7 @@ body::before {
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 .search-icon {
     width: 20px;
@@ -107,37 +113,39 @@ body::before {
     text-align: center;
     padding: 8px;
     border-radius: 16px;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
 }
 .tab.active {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
     font-weight: bold;
 }
 .tab:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.4);
 }
 
 .card {
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     cursor: pointer;
-    transform: translateY(20px);
+    transform: translateY(30px);
     opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 .card.visible {
     opacity: 1;
     transform: translateY(0);
 }
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
 }
 .card-header {
     display: flex;
@@ -146,7 +154,7 @@ body::before {
     margin-bottom: 12px;
 }
 .user-badge {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.25);
     padding: 6px 12px;
     border-radius: 20px;
     display: flex;
@@ -155,6 +163,7 @@ body::before {
     max-width: 70%;
     overflow: hidden;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 .user-icon {
     width: 32px;
@@ -170,7 +179,7 @@ body::before {
     text-overflow: ellipsis;
 }
 .share-btn {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -180,13 +189,14 @@ body::before {
     width: 36px;
     height: 36px;
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 .share-icon {
     width: 20px;
     height: 20px;
 }
 .preview {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.2);
     border-radius: 12px;
     height: 180px;
     display: flex;
@@ -218,14 +228,15 @@ body::before {
     margin-top: 20px;
 }
 .page {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     padding: 6px 12px;
     border-radius: 12px;
     cursor: pointer;
     font-size: 14px;
+    -webkit-tap-highlight-color: transparent;
 }
 .page.active {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
     font-weight: bold;
 }
 
@@ -245,17 +256,26 @@ body::before {
 .detail-content {
     max-width: 500px;
     margin: 40px auto;
-    background: rgba(30,30,30,0.9);
+    background: rgba(30,30,30,0.85);
     border-radius: 20px;
     padding: 25px;
     position: relative;
     box-sizing: border-box;
 }
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+.detail-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .close-detail-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
     border: none;
     border-radius: 50%;
     width: 36px;
@@ -264,17 +284,29 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1001;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
 }
 .close-btn-icon {
     width: 20px;
     height: 20px;
 }
-.detail-header {
+.detail-share-btn {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+}
+.detail-share-icon {
+    width: 20px;
+    height: 20px;
 }
 .detail-image {
     width: 100%;
@@ -324,9 +356,14 @@ body::before {
     background: #fed403;
     color: #000;
     font-weight: bold;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 .action-btn:hover {
     opacity: 0.9;
+}
+.action-btn:active {
+    opacity: 0.8;
 }
 .action-btn img {
     width: 22px;
@@ -336,9 +373,9 @@ body::before {
     background: #ff0000;
     color: white;
 }
-.link-btn {
-    background: #2196F3;
-    color: white;
+.link-btn, .tool-btn, .other-btn {
+    background: #fed403;
+    color: #000;
 }
 .loading {
     text-align: center;
@@ -364,7 +401,7 @@ body::before {
     right: 20px;
     width: 40px;
     height: 40px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.25);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -373,6 +410,7 @@ body::before {
     z-index: 100;
     opacity: 0;
     transition: opacity 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 .scroll-helper.visible {
     opacity: 1;
