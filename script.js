@@ -6,6 +6,8 @@ let allData = {};
 let searchQuery = '';
 let isSearchActive = false;
 let scrollTimeout = null;
+let currentPage = 1;
+const itemsPerPage = 8;
 
 // DOM elements
 const contentEl = document.getElementById('content');
@@ -17,6 +19,19 @@ const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
 const brand = document.querySelector('.brand');
 const scrollHelper = document.createElement('div');
+const paginationEl = document.querySelector('.pagination');
+const contentContainer = document.createElement('div');
+
+// Create content container
+contentContainer.className = 'content-container';
+contentEl.parentNode.insertBefore(contentContainer, contentEl);
+contentContainer.appendChild(contentEl);
+
+// Create footer
+const footer = document.createElement('div');
+footer.className = 'footer';
+footer.innerHTML = 'A PRODUCT OF LAG FF';
+contentContainer.parentNode.appendChild(footer);
 
 // Create scroll helper element
 scrollHelper.className = 'scroll-helper';
@@ -42,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
             searchQuery = e.target.value;
+            currentPage = 1;
             filterContent();
         }
     });
@@ -58,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             searchIcon.src = 'https://storage.craftx.site/f1/Search.png';
             searchQuery = '';
             searchInput.value = '';
+            currentPage = 1;
             filterContent();
         }
     });
@@ -84,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.classList.add('active');
             const type = tab.getAttribute('data-type');
             currentType = type;
+            currentPage = 1;
             if (allData[type]) {
                 currentData = allData[type];
                 filterContent();
@@ -185,18 +203,76 @@ function filterContent() {
     
     if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        visibleItems = visibleItems.filter(item => 
-            (item.name && item.name.toLowerCase().includes(query)) ||
-            (item.description && item.description.toLowerCase().includes(query))
-        );
+        visibleItems = visibleItems.filter(item => {
+            const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
+            const creatorName = creator.name || '';
+            
+            return (item.name && item.name.toLowerCase().includes(query)) ||
+                   (item.description && item.description.toLowerCase().includes(query)) ||
+                   (creatorName.toLowerCase().includes(query));
+        });
     }
     
-    if (visibleItems.length === 0) {
+    // Calculate pagination
+    const totalPages = Math.ceil(visibleItems.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = visibleItems.slice(startIndex, endIndex);
+    
+    if (paginatedItems.length === 0) {
         contentEl.innerHTML = `<div class="empty">No ${currentType} content found${searchQuery ? ' for "' + searchQuery + '"' : ''}.</div>`;
+        renderPagination(visibleItems.length, totalPages);
         return;
     }
 
-    renderItems(visibleItems, currentType);
+    renderItems(paginatedItems, currentType);
+    renderPagination(visibleItems.length, totalPages);
+}
+
+// Render pagination
+function renderPagination(totalItems, totalPages) {
+    paginationEl.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    if (currentPage > 1) {
+        const prevBtn = document.createElement('div');
+        prevBtn.className = 'page';
+        prevBtn.textContent = '←';
+        prevBtn.addEventListener('click', () => {
+            currentPage--;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(prevBtn);
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement('div');
+        pageBtn.className = `page ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', () => {
+            currentPage = i;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(pageBtn);
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+        const nextBtn = document.createElement('div');
+        nextBtn.className = 'page';
+        nextBtn.textContent = '→';
+        nextBtn.addEventListener('click', () => {
+            currentPage++;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(nextBtn);
+    }
 }
 
 // Render items to the content area
@@ -288,7 +364,7 @@ function showDetailView(item, type) {
         
         buttonsHTML = indiaCodesHTML + otherCodesHTML;
     } else if (item.button_links && item.button_links.length > 0) {
-        // Other button links - use yellow color for tools and others
+        // Other button links - use dark color for tools and others
         const buttonClass = type === 'tool' ? 'tool-btn' : 'other-btn';
         item.button_links.forEach(link => {
             if (link.type === 'download file') {
@@ -341,12 +417,20 @@ function showDetailView(item, type) {
     
     detailViewEl.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    
+    // Add opening animation
+    setTimeout(() => {
+        detailContentEl.classList.add('open');
+    }, 10);
 }
 
 // Close detail view
 function closeDetailView() {
-    detailViewEl.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    detailContentEl.classList.remove('open');
+    setTimeout(() => {
+        detailViewEl.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 200);
 }
 
 // Copy text to clipboard
