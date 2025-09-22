@@ -15,11 +15,12 @@ const tabs = document.querySelectorAll('.tab');
 const searchBtn = document.querySelector('.search-btn');
 const searchInput = document.querySelector('.search-input');
 const searchIcon = document.querySelector('.search-icon');
+const brand = document.querySelector('.brand');
 const scrollHelper = document.createElement('div');
 
 // Create scroll helper element
 scrollHelper.className = 'scroll-helper';
-scrollHelper.innerHTML = '<img class="scroll-helper-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Scroll.png" alt="Scroll">';
+scrollHelper.innerHTML = '<img class="scroll-helper-icon" src="https://storage.craftx.site/f1/Scrollup.png" alt="Scroll">';
 scrollHelper.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up scroll event listener with debounce
     window.addEventListener('scroll', () => {
         clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(handleScroll, 100);
+        scrollTimeout = setTimeout(handleScroll, 50);
     });
     
     // Set up search functionality
@@ -50,15 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (isSearchActive) {
             searchInput.classList.add('active');
-            searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png';
+            searchIcon.src = 'https://storage.craftx.site/f1/Close.png';
             searchInput.focus();
         } else {
             searchInput.classList.remove('active');
-            searchIcon.src = 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Search.png';
+            searchIcon.src = 'https://storage.craftx.site/f1/Search.png';
             searchQuery = '';
             searchInput.value = '';
             filterContent();
         }
+    });
+
+    // Make CraftX title clickable
+    brand.addEventListener('click', () => {
+        window.open('https://www.google.com', '_self');
     });
 
     // Load team data first (for creator names)
@@ -108,7 +114,7 @@ function handleScroll() {
     
     // Animate cards on scroll with optimized performance
     const cards = document.querySelectorAll('.card:not(.visible)');
-    const screenPosition = window.innerHeight / 1.3;
+    const screenPosition = window.innerHeight / 1.2;
     
     for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
@@ -202,7 +208,7 @@ function renderItems(items, type) {
         
         const card = document.createElement('div');
         card.className = 'card';
-        card.style.transitionDelay = `${index * 0.05}s`;
+        card.style.transitionDelay = `${index * 0.03}s`;
         card.addEventListener('click', () => {
             showDetailView(item, type);
         });
@@ -210,11 +216,11 @@ function renderItems(items, type) {
         card.innerHTML = `
             <div class="card-header">
                 <div class="user-badge" onclick="event.stopPropagation(); openUserUrl('${creator.url || ''}')">
-                    <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                    <img class="user-icon" src="${creator.img_url || 'https://storage.craftx.site/f1/nouser.png'}" alt="${creator.name || 'Unknown'}">
                     <span class="user-name">${creator.name || 'Unknown'}</span>
                 </div>
                 <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id})">
-                    <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
+                    <img class="share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
                 </button>
             </div>
             
@@ -232,7 +238,7 @@ function renderItems(items, type) {
     // Trigger scroll event to animate cards
     setTimeout(() => {
         handleScroll();
-    }, 100);
+    }, 50);
 }
 
 // Open user URL
@@ -262,7 +268,7 @@ function showDetailView(item, type) {
             item.map_code_ind.forEach(code => {
                 indiaCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}
+                        <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
                     </button>
                 `;
             });
@@ -274,7 +280,7 @@ function showDetailView(item, type) {
             item.map_code_other.forEach(code => {
                 otherCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Copy.png" alt="Copy"> ${code.name}
+                        <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
                     </button>
                 `;
             });
@@ -282,18 +288,19 @@ function showDetailView(item, type) {
         
         buttonsHTML = indiaCodesHTML + otherCodesHTML;
     } else if (item.button_links && item.button_links.length > 0) {
-        // Other button links
+        // Other button links - use yellow color for tools and others
+        const buttonClass = type === 'tool' ? 'tool-btn' : 'other-btn';
         item.button_links.forEach(link => {
             if (link.type === 'download file') {
                 buttonsHTML += `
-                    <button class="action-btn link-btn" onclick="window.open('${link.url}', '_self')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Download.png" alt="Download"> ${link.label}
+                    <button class="action-btn link-btn ${buttonClass}" onclick="window.open('${link.url}', '_self')">
+                        <img src="https://storage.craftx.site/f1/Download.png" alt="Download"> ${link.label}
                     </button>
                 `;
             } else {
                 buttonsHTML += `
-                    <button class="action-btn link-btn" onclick="window.open('${link.url}', '_blank')">
-                        <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Link.png" alt="Link"> ${link.label}
+                    <button class="action-btn link-btn ${buttonClass}" onclick="window.open('${link.url}', '_blank')">
+                        <img src="https://storage.craftx.site/f1/Link.png" alt="Link"> ${link.label}
                     </button>
                 `;
             }
@@ -304,23 +311,25 @@ function showDetailView(item, type) {
     if (item.youtube_url) {
         buttonsHTML = `
             <button class="action-btn youtube-btn" onclick="window.open('${item.youtube_url}', '_blank')">
-                <img src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/YouTube.png" alt="YouTube"> Watch on YouTube
+                <img src="https://storage.craftx.site/f1/YouTube.png" alt="YouTube"> Watch on YouTube
             </button>
         ` + buttonsHTML;
     }
     
     detailContentEl.innerHTML = `
-        <button class="close-detail-btn" onclick="closeDetailView()">
-            <img class="close-btn-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Close.png" alt="Close">
-        </button>
         <div class="detail-header">
             <div class="user-badge" onclick="openUserUrl('${creator.url || ''}')">
-                <img class="user-icon" src="${creator.img_url || 'https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                <img class="user-icon" src="${creator.img_url || 'https://storage.craftx.site/f1/nouser.png'}" alt="${creator.name || 'Unknown'}">
                 <span class="user-name">${creator.name || 'Unknown'}</span>
             </div>
-            <button class="share-btn" onclick="shareItem('${type}', ${item.id})">
-                <img class="share-icon" src="https://tfmuzuipuajtjzrjdkjt.supabase.co/storage/v1/object/public/craftxv1/Share.png" alt="Share">
-            </button>
+            <div class="detail-header-buttons">
+                <button class="detail-share-btn" onclick="shareItem('${type}', ${item.id})">
+                    <img class="detail-share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
+                </button>
+                <button class="close-detail-btn" onclick="closeDetailView()">
+                    <img class="close-btn-icon" src="https://storage.craftx.site/f1/Close.png" alt="Close">
+                </button>
+            </div>
         </div>
         <img class="detail-image" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'">
         <div class="detail-title">${item.name}</div>
