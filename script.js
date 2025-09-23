@@ -1,414 +1,521 @@
-(function(){
-    'use strict';
-    
-    let z1='map',z2=[],z3=[],z4={},z5='',z6=false,z7=null,z8=1;
-    const z9=8;
-    const z10=document.getElementById('content');
-    const z11=document.getElementById('detailView');
-    const z12=document.getElementById('detailContent');
-    const z13=document.querySelectorAll('.tab');
-    const z14=document.querySelector('.search-btn');
-    const z15=document.querySelector('.search-input');
-    const z16=document.querySelector('.search-icon');
-    const z17=document.querySelector('.brand');
-    const z18=document.querySelector('.pagination');
-    const z19=document.createElement('div');
-    const z20=document.querySelector('.footer');
-    
-    z19.className='scroll-helper';
-    z19.innerHTML='<img class="scroll-helper-icon" src="https://storage.craftx.site/f1/Scrollup.png" alt="Scroll">';
-    z19.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
-    document.body.appendChild(z19);
-    
-    z20.addEventListener('click',()=>{
-        window.open('https://www.google.com','_self');
+// Global variables
+let currentType = 'map';
+let currentData = [];
+let teamData = [];
+let allData = {};
+let searchQuery = '';
+let isSearchActive = false;
+let scrollTimeout = null;
+let currentPage = 1;
+const itemsPerPage = 8;
+
+// DOM elements
+const contentEl = document.getElementById('content');
+const detailViewEl = document.getElementById('detailView');
+const detailContentEl = document.getElementById('detailContent');
+const tabs = document.querySelectorAll('.tab');
+const searchBtn = document.querySelector('.search-btn');
+const searchInput = document.querySelector('.search-input');
+const searchIcon = document.querySelector('.search-icon');
+const brand = document.querySelector('.brand');
+const scrollHelper = document.createElement('div');
+const paginationEl = document.querySelector('.pagination');
+const contentContainer = document.createElement('div');
+
+// Create content container
+contentContainer.className = 'content-container';
+contentEl.parentNode.insertBefore(contentContainer, contentEl);
+contentContainer.appendChild(contentEl);
+
+// Create footer
+const footer = document.createElement('div');
+footer.className = 'footer';
+footer.innerHTML = 'A PRODUCT OF LAG FF';
+contentContainer.parentNode.appendChild(footer);
+
+// Create scroll helper element
+scrollHelper.className = 'scroll-helper';
+scrollHelper.innerHTML = '<img class="scroll-helper-icon" src="https://storage.craftx.site/f1/Scrollup.png" alt="Scroll">';
+scrollHelper.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+document.body.appendChild(scrollHelper);
+
+// CORS proxy server
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
+
+// Initialize the app
+document.addEventListener('DOMContentLoaded', () => {
+    // Set up scroll event listener with debounce
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(handleScroll, 50);
     });
     
-    const z21='https://cors-anywhere.herokuapp.com/';
-    const z22='https://craftx-json-stored.vercel.app/view/';
-    
-    document.addEventListener('DOMContentLoaded',()=>{
-        window.addEventListener('scroll',()=>{
-            clearTimeout(z7);
-            z7=setTimeout(z23,50);
-        });
-        
-        z15.addEventListener('keyup',(e)=>{
-            if(e.key==='Enter'){
-                z5=e.target.value;
-                z8=1;
-                z24();
-            }
-        });
-        
-        z14.addEventListener('click',()=>{
-            z6=!z6;
-            if(z6){
-                z15.classList.add('active');
-                z16.src='https://storage.craftx.site/f1/Close.png';
-                z15.focus();
-            }else{
-                z15.classList.remove('active');
-                z16.src='https://storage.craftx.site/f1/Search.png';
-                z5='';
-                z15.value='';
-                z8=1;
-                z24();
-            }
-        });
-        
-        z17.addEventListener('click',()=>{
-            window.open('https://www.google.com','_self');
-        });
-        
-        z25('team').then(data=>{
-            z3=data.team||[];
-            z25('map');
-        }).catch(error=>{
-            z10.innerHTML='<div class="error">Failed to load data.</div>';
-        });
-        
-        z13.forEach(tab=>{
-            tab.addEventListener('click',()=>{
-                z13.forEach(t=>t.classList.remove('active'));
-                tab.classList.add('active');
-                const type=tab.getAttribute('data-type');
-                z1=type;
-                z8=1;
-                if(z4[type]){
-                    z2=z4[type];
-                    z24();
-                }else{
-                    z25(type);
-                }
-            });
-        });
-        
-        z11.addEventListener('click',(e)=>{
-            if(e.target===z11){
-                z26();
-            }
-        });
-        
-        document.addEventListener('contextmenu',(e)=>{
-            e.preventDefault();
-            return false;
-        });
-        
-        document.addEventListener('keydown',(e)=>{
-            if(e.ctrlKey&&(e.key==='u'||e.key==='U'||e.key==='s'||e.key==='S')){
-                e.preventDefault();
-                return false;
-            }
-        });
-        
-        Object.defineProperty(document,'designMode',{set:function(){},get:function(){return'off'}});
-        Object.defineProperty(document,'contentEditable',{set:function(){},get:function(){return'false'}});
+    // Set up search functionality
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            searchQuery = e.target.value;
+            currentPage = 1;
+            filterContent();
+        }
     });
-    
-    function z23(){
-        const z27=window.pageYOffset;
-        if(z27>300){
-            z19.classList.add('visible');
-        }else{
-            z19.classList.remove('visible');
+
+    searchBtn.addEventListener('click', () => {
+        isSearchActive = !isSearchActive;
+        
+        if (isSearchActive) {
+            searchInput.classList.add('active');
+            searchIcon.src = 'https://storage.craftx.site/f1/Close.png';
+            searchInput.focus();
+        } else {
+            searchInput.classList.remove('active');
+            searchIcon.src = 'https://storage.craftx.site/f1/Search.png';
+            searchQuery = '';
+            searchInput.value = '';
+            currentPage = 1;
+            filterContent();
         }
-        const z28=document.querySelectorAll('.card:not(.visible)');
-        const z29=window.innerHeight/1.2;
-        for(let i=0;i<z28.length;i++){
-            const z30=z28[i];
-            const z31=z30.getBoundingClientRect().top;
-            if(z31<z29){
-                z30.classList.add('visible');
+    });
+
+    // Make CraftX title clickable
+    brand.addEventListener('click', () => {
+        window.open('https://www.google.com', '_self');
+    });
+
+    // Load team data first (for creator names)
+    fetchData('team').then(data => {
+        teamData = data.team || [];
+        // Load initial content (maps)
+        loadContent('map');
+    }).catch(error => {
+        console.error('Error loading team data:', error);
+        contentEl.innerHTML = `<div class="error">Failed to load data. Please try again later.</div>`;
+    });
+
+    // Set up tab click events
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const type = tab.getAttribute('data-type');
+            currentType = type;
+            currentPage = 1;
+            if (allData[type]) {
+                currentData = allData[type];
+                filterContent();
+            } else {
+                loadContent(type);
             }
-        }
-    }
-    
-    async function z25(type){
-        try{
-            try{
-                const z32=await fetch(z22+type,{headers:{'X-View-Key':'keyview'}});
-                if(z32.ok)return await z32.json();
-            }catch(z33){}
-            const z34=await fetch(z21+z22+type,{headers:{'X-View-Key':'keyview','X-Requested-With':'XMLHttpRequest'}});
-            if(!z34.ok)throw new Error(`HTTP error! status: ${z34.status}`);
-            return await z34.json();
-        }catch(z35){
-            return{[type]:[]};
-        }
-    }
-    
-    async function z36(type){
-        z10.innerHTML='<div class="loading">Loading '+type+' content...</div>';
-        try{
-            const data=await z25(type);
-            z4[type]=data[type]||[];
-            z2=z4[type];
-            z24();
-        }catch(z35){
-            z10.innerHTML='<div class="error">Failed to load '+type+' content.</div>';
-        }
-    }
-    
-    function z24(){
-        let z37=z2.filter(item=>item.visible!==false);
-        if(z5){
-            const z38=z5.toLowerCase();
-            z37=z37.filter(item=>{
-                const z39=z3.find(z40=>z40.id===item.creator_id)||{};
-                const z41=z39.name||'';
-                return(item.name&&item.name.toLowerCase().includes(z38))||
-                      (item.description&&item.description.toLowerCase().includes(z38))||
-                      (z41.toLowerCase().includes(z38));
-            });
-        }
-        const z42=Math.ceil(z37.length/z9);
-        const z43=(z8-1)*z9;
-        const z44=z43+z9;
-        const z45=z37.slice(z43,z44);
-        if(z45.length===0){
-            z10.innerHTML='<div class="empty">No '+z1+' content found'+(z5?' for "'+z5+'"':'')+'.</div>';
-            z46(z37.length,z42);
-            return;
-        }
-        z47(z45,z1);
-        z46(z37.length,z42);
-    }
-    
-    function z46(z48,z49){
-        z18.innerHTML='';
-        if(z49<=1)return;
-        if(z8>1){
-            const z50=document.createElement('div');
-            z50.className='page';
-            z50.textContent='←';
-            z50.addEventListener('click',()=>{
-                z8--;
-                z24();
-                window.scrollTo({top:0,behavior:'smooth'});
-            });
-            z18.appendChild(z50);
-        }
-        for(let i=1;i<=z49;i++){
-            const z51=document.createElement('div');
-            z51.className='page '+(i===z8?'active':'');
-            z51.textContent=i;
-            z51.addEventListener('click',()=>{
-                z8=i;
-                z24();
-                window.scrollTo({top:0,behavior:'smooth'});
-            });
-            z18.appendChild(z51);
-        }
-        if(z8<z49){
-            const z52=document.createElement('div');
-            z52.className='page';
-            z52.textContent='→';
-            z52.addEventListener('click',()=>{
-                z8++;
-                z24();
-                window.scrollTo({top:0,behavior:'smooth'});
-            });
-            z18.appendChild(z52);
-        }
-    }
-    
-    function z47(z53,type){
-        z10.innerHTML='';
-        z53.forEach((item,index)=>{
-            const z39=z3.find(z40=>z40.id===item.creator_id)||{};
-            const z54=document.createElement('div');
-            z54.className='card';
-            z54.style.transitionDelay=index*0.03+'s';
-            z54.addEventListener('click',()=>{
-                z55(item,type);
-            });
-            z54.innerHTML=`
-                <div class="card-header">
-                    <div class="user-badge" onclick="event.stopPropagation(); z56('${z39.url||''}')">
-                        <img class="user-icon" src="${z39.img_url||'https://storage.craftx.site/f1/nouser.png'}" alt="${z39.name||'Unknown'}">
-                        <span class="user-name">${z39.name||'Unknown'}</span>
-                    </div>
-                    <button class="share-btn" onclick="event.stopPropagation(); z57('${type}', ${item.id})">
-                        <img class="share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
-                    </button>
-                </div>
-                <div class="preview">
-                    <img class="preview-img" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div style="display: ${item.img_url?'none':'flex'}; align-items: center; justify-content: center;">IMAGE NOT AVAILABLE</div>
-                </div>
-                <div class="title">${item.name}</div>
-            `;
-            z10.appendChild(z54);
         });
-        setTimeout(z23,50);
+    });
+
+    // Close detail view when clicking outside
+    detailViewEl.addEventListener('click', (e) => {
+        if (e.target === detailViewEl) {
+            closeDetailView();
+        }
+    });
+});
+
+// Handle scroll events with debounce
+function handleScroll() {
+    const currentScrollPosition = window.pageYOffset;
+    
+    // Show/hide scroll helper
+    if (currentScrollPosition > 300) {
+        scrollHelper.classList.add('visible');
+    } else {
+        scrollHelper.classList.remove('visible');
     }
     
-    window.z56=function(z58){
-        if(z58&&z58.trim()!==''){
-            let z59=z58;
-            if(!z58.startsWith('http://')&&!z58.startsWith('https://')){
-                z59='https://'+z58;
-            }
-            window.open(z59,'_self');
-        }
-    };
+    // Animate cards on scroll with optimized performance
+    const cards = document.querySelectorAll('.card:not(.visible)');
+    const screenPosition = window.innerHeight / 1.2;
     
-    function z55(item,type){
-        const z39=z3.find(z40=>z40.id===item.creator_id)||{};
-        let z60='';
-        let z61='';
-        let z62='';
-        if(type==='map'||type==='asset'){
-            if(item.map_code_ind&&item.map_code_ind.length>0){
-                z61='<div class="code-section-title">'+(type==='map'?'Map Code For India Server':'Asset Code For India Server')+'</div>';
-                item.map_code_ind.forEach(z63=>{
-                    z61+=`
-                        <button class="action-btn code-btn" onclick="z64('${z63.code}')">
-                            <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${z63.name}
-                        </button>
-                    `;
-                });
-            }
-            if(item.map_code_other&&item.map_code_other.length>0){
-                z62='<div class="code-section-title">'+(type==='map'?'Map Code For Other Server':'Asset Code For Other Server')+'</div>';
-                item.map_code_other.forEach(z63=>{
-                    z62+=`
-                        <button class="action-btn code-btn" onclick="z64('${z63.code}')">
-                            <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${z63.name}
-                        </button>
-                    `;
-                });
-            }
-            z60=z61+z62;
-        }else if(item.button_links&&item.button_links.length>0){
-            const z65=type==='tool'?'tool-btn':'other-btn';
-            item.button_links.forEach(z66=>{
-                if(z66.type==='download file'){
-                    z60+=`
-                        <button class="action-btn link-btn ${z65}" onclick="window.open('${z66.url}', '_self')">
-                            <img src="https://storage.craftx.site/f1/Download.png" alt="Download"> ${z66.label}
-                        </button>
-                    `;
-                }else{
-                    z60+=`
-                        <button class="action-btn link-btn ${z65}" onclick="window.open('${z66.url}', '_blank')">
-                            <img src="https://storage.craftx.site/f1/Link.png" alt="Link"> ${z66.label}
-                        </button>
-                    `;
+    for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        const cardPosition = card.getBoundingClientRect().top;
+        
+        if (cardPosition < screenPosition) {
+            card.classList.add('visible');
+        }
+    }
+}
+
+// Fetch data from API with CORS proxy
+async function fetchData(type) {
+    try {
+        // Try direct fetch first
+        try {
+            const response = await fetch(API_BASE + type, {
+                headers: {
+                    'X-View-Key': 'keyview'
                 }
             });
+
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (directError) {
+            console.log('Direct fetch failed, trying with CORS proxy:', directError);
         }
-        if(item.youtube_url){
-            z60=`
-                <button class="action-btn youtube-btn" onclick="window.open('${item.youtube_url}', '_blank')">
-                    <img src="https://storage.craftx.site/f1/YouTube.png" alt="YouTube"> Watch on YouTube
+
+        // If direct fetch fails, use CORS proxy
+        const response = await fetch(CORS_PROXY + API_BASE + type, {
+            headers: {
+                'X-View-Key': 'keyview',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        
+        // Return empty data if API fails
+        return {[type]: []};
+    }
+}
+
+// Load content based on type
+async function loadContent(type) {
+    contentEl.innerHTML = `<div class="loading">Loading ${type} content...</div>`;
+
+    try {
+        const data = await fetchData(type);
+        allData[type] = data[type] || [];
+        currentData = allData[type];
+        
+        filterContent();
+    } catch (error) {
+        contentEl.innerHTML = `<div class="error">Failed to load ${type} content. Please try again later.</div>`;
+    }
+}
+
+function filterContent() {
+    let visibleItems = currentData.filter(item => item.visible !== false);
+    
+    if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        visibleItems = visibleItems.filter(item => {
+            const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
+            const creatorName = creator.name || '';
+            
+            return (item.name && item.name.toLowerCase().includes(query)) ||
+                   (item.description && item.description.toLowerCase().includes(query)) ||
+                   (creatorName.toLowerCase().includes(query));
+        });
+    }
+    
+    // Calculate pagination
+    const totalPages = Math.ceil(visibleItems.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = visibleItems.slice(startIndex, endIndex);
+    
+    if (paginatedItems.length === 0) {
+        contentEl.innerHTML = `<div class="empty">No ${currentType} content found${searchQuery ? ' for "' + searchQuery + '"' : ''}.</div>`;
+        renderPagination(visibleItems.length, totalPages);
+        return;
+    }
+
+    renderItems(paginatedItems, currentType);
+    renderPagination(visibleItems.length, totalPages);
+}
+
+// Render pagination
+function renderPagination(totalItems, totalPages) {
+    paginationEl.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    if (currentPage > 1) {
+        const prevBtn = document.createElement('div');
+        prevBtn.className = 'page';
+        prevBtn.textContent = '←';
+        prevBtn.addEventListener('click', () => {
+            currentPage--;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(prevBtn);
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        const pageBtn = document.createElement('div');
+        pageBtn.className = `page ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', () => {
+            currentPage = i;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(pageBtn);
+    }
+    
+    // Next button
+    if (currentPage < totalPages) {
+        const nextBtn = document.createElement('div');
+        nextBtn.className = 'page';
+        nextBtn.textContent = '→';
+        nextBtn.addEventListener('click', () => {
+            currentPage++;
+            filterContent();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        paginationEl.appendChild(nextBtn);
+    }
+}
+
+// Render items to the content area
+function renderItems(items, type) {
+    contentEl.innerHTML = '';
+    
+    items.forEach((item, index) => {
+        const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.transitionDelay = `${index * 0.03}s`;
+        card.addEventListener('click', () => {
+            showDetailView(item, type);
+        });
+        
+        card.innerHTML = `
+            <div class="card-header">
+                <div class="user-badge" onclick="event.stopPropagation(); openUserUrl('${creator.url || ''}')">
+                    <img class="user-icon" src="${creator.img_url || 'https://storage.craftx.site/f1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                    <span class="user-name">${creator.name || 'Unknown'}</span>
+                </div>
+                <button class="share-btn" onclick="event.stopPropagation(); shareItem('${type}', ${item.id})">
+                    <img class="share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
                 </button>
-            `+z60;
-        }
-        z12.innerHTML=`
-            <div class="detail-header">
-                <div class="user-badge" onclick="z56('${z39.url||''}')">
-                    <img class="user-icon" src="${z39.img_url||'https://storage.craftx.site/f1/nouser.png'}" alt="${z39.name||'Unknown'}">
-                    <span class="user-name">${z39.name||'Unknown'}</span>
-                </div>
-                <div class="detail-header-buttons">
-                    <button class="detail-share-btn" onclick="z57('${type}', ${item.id})">
-                        <img class="detail-share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
-                    </button>
-                    <button class="close-detail-btn" onclick="z26()">
-                        <img class="close-btn-icon" src="https://storage.craftx.site/f1/Close.png" alt="Close">
-                    </button>
-                </div>
             </div>
-            <img class="detail-image" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'">
-            <div class="detail-title">${item.name}</div>
-            <div class="detail-description">${item.description||'No description available'}</div>
-            <div class="action-buttons">
-                ${z60||'<p>No actions available</p>'}
+            
+            <div class="preview">
+                <img class="preview-img" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display: ${item.img_url ? 'none' : 'flex'}; align-items: center; justify-content: center;">IMAGE NOT AVAILABLE</div>
             </div>
+            
+            <div class="title">${item.name}</div>
         `;
-        z11.style.display='block';
-        document.body.style.overflow='hidden';
-        setTimeout(()=>{
-            z12.classList.add('open');
-        },10);
+        
+        contentEl.appendChild(card);
+    });
+    
+    // Trigger scroll event to animate cards
+    setTimeout(() => {
+        handleScroll();
+    }, 50);
+}
+
+// Open user URL
+function openUserUrl(url) {
+    if (url && url.trim() !== '') {
+        // Add https:// if not present
+        let fullUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            fullUrl = 'https://' + url;
+        }
+        window.open(fullUrl, '_self');
     }
+}
+
+// Show detail view for an item
+function showDetailView(item, type) {
+    const creator = teamData.find(teamMember => teamMember.id === item.creator_id) || {};
     
-    function z26(){
-        z12.classList.remove('open');
-        setTimeout(()=>{
-            z11.style.display='none';
-            document.body.style.overflow='auto';
-        },200);
-    }
+    let buttonsHTML = '';
+    let indiaCodesHTML = '';
+    let otherCodesHTML = '';
     
-    window.z64=function(z67){
-        navigator.clipboard.writeText(z67).then(()=>{
-            alert('Copied to clipboard: '+z67);
-        }).catch(z35=>{
-            console.error('Failed to copy: ',z35);
-        });
-    };
-    
-    window.z57=function(type,id){
-        const z68=`${window.location.origin}${window.location.pathname}#${type}/${id}`;
-        if(navigator.share){
-            navigator.share({
-                title:'Check out this CraftX content',
-                url:z68
-            }).catch(z35=>{});
-        }else{
-            navigator.clipboard.writeText(z68).then(()=>{
-                alert('Link copied to clipboard!');
-            }).catch(z35=>{
-                console.error('Failed to copy: ',z35);
-                prompt('Copy this link:',z68);
+    if (type === 'map' || type === 'asset') {
+        // Map and asset codes for India
+        if (item.map_code_ind && item.map_code_ind.length > 0) {
+            indiaCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For India Server' : 'Asset Code For India Server'}</div>`;
+            item.map_code_ind.forEach(code => {
+                indiaCodesHTML += `
+                    <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
+                        <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
+                    </button>
+                `;
             });
         }
-    };
-    
-    window.addEventListener('hashchange',()=>{
-        const z69=window.location.hash.substring(1);
-        const z70=z69.split('/');
-        if(z70.length===2){
-            const type=z70[0];
-            const id=parseInt(z70[1]);
-            const z71=document.querySelector(`.tab[data-type="${type}"]`);
-            if(z71){
-                z71.click();
-                setTimeout(()=>{
-                    const z72=z2.find(item=>item.id===id);
-                    if(z72&&z72.visible!==false){
-                        z55(z72,type);
-                    }
-                },500);
+        
+        // Map and asset codes for Other regions
+        if (item.map_code_other && item.map_code_other.length > 0) {
+            otherCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For Other Server' : 'Asset Code For Other Server'}</div>`;
+            item.map_code_other.forEach(code => {
+                otherCodesHTML += `
+                    <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
+                        <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
+                    </button>
+                `;
+            });
+        }
+        
+        buttonsHTML = indiaCodesHTML + otherCodesHTML;
+    } else if (item.button_links && item.button_links.length > 0) {
+        // Other button links - use dark color for tools and others
+        const buttonClass = type === 'tool' ? 'tool-btn' : 'other-btn';
+        item.button_links.forEach(link => {
+            if (link.type === 'download file') {
+                buttonsHTML += `
+                    <button class="action-btn link-btn ${buttonClass}" onclick="window.open('${link.url}', '_self')">
+                        <img src="https://storage.craftx.site/f1/Download.png" alt="Download"> ${link.label}
+                    </button>
+                `;
+            } else {
+                buttonsHTML += `
+                    <button class="action-btn link-btn ${buttonClass}" onclick="window.open('${link.url}', '_blank')">
+                        <img src="https://storage.craftx.site/f1/Link.png" alt="Link"> ${link.label}
+                    </button>
+                `;
             }
-        }
-    });
+        });
+    }
     
-    window.addEventListener('load',()=>{
-        const z69=window.location.hash.substring(1);
-        const z70=z69.split('/');
-        if(z70.length===2){
-            const type=z70[0];
-            const id=parseInt(z70[1]);
-            z25('team').then(data=>{
-                z3=data.team||[];
-                const z71=document.querySelector(`.tab[data-type="${type}"]`);
-                if(z71){
-                    z71.click();
-                    setTimeout(()=>{
-                        z25(type).then(data=>{
-                            z2=data[type]||[];
-                            const z72=z2.find(item=>item.id===id);
-                            if(z72&&z72.visible!==false){
-                                z55(z72,type);
-                            }
-                        });
-                    },500);
-                }
-            });
-        }
+    // YouTube button if available
+    if (item.youtube_url) {
+        buttonsHTML = `
+            <button class="action-btn youtube-btn" onclick="window.open('${item.youtube_url}', '_blank')">
+                <img src="https://storage.craftx.site/f1/YouTube.png" alt="YouTube"> Watch on YouTube
+            </button>
+        ` + buttonsHTML;
+    }
+    
+    detailContentEl.innerHTML = `
+        <div class="detail-header">
+            <div class="user-badge" onclick="openUserUrl('${creator.url || ''}')">
+                <img class="user-icon" src="${creator.img_url || 'https://storage.craftx.site/f1/nouser.png'}" alt="${creator.name || 'Unknown'}">
+                <span class="user-name">${creator.name || 'Unknown'}</span>
+            </div>
+            <div class="detail-header-buttons">
+                <button class="detail-share-btn" onclick="shareItem('${type}', ${item.id})">
+                    <img class="detail-share-icon" src="https://storage.craftx.site/f1/Share.png" alt="Share">
+                </button>
+                <button class="close-detail-btn" onclick="closeDetailView()">
+                    <img class="close-btn-icon" src="https://storage.craftx.site/f1/Close.png" alt="Close">
+                </button>
+            </div>
+        </div>
+        <img class="detail-image" src="${item.img_url}" alt="${item.name}" onerror="this.style.display='none'">
+        <div class="detail-title">${item.name}</div>
+        <div class="detail-description">${item.description || 'No description available'}</div>
+        <div class="action-buttons">
+            ${buttonsHTML || '<p>No actions available</p>'}
+        </div>
+    `;
+    
+    detailViewEl.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    
+    // Add opening animation
+    setTimeout(() => {
+        detailContentEl.classList.add('open');
+    }, 10);
+}
+
+// Close detail view
+function closeDetailView() {
+    detailContentEl.classList.remove('open');
+    setTimeout(() => {
+        detailViewEl.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 200);
+}
+
+// Copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard: ' + text);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
     });
-})();
+}
+
+// Share item URL
+function shareItem(type, id) {
+    const url = `${window.location.origin}${window.location.pathname}#${type}/${id}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Check out this CraftX content',
+            url: url
+        }).catch(console.error);
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Link copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            prompt('Copy this link:', url);
+        });
+    }
+}
+
+// Handle URL hash changes for direct links
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.substring(1);
+    const parts = hash.split('/');
+    
+    if (parts.length === 2) {
+        const type = parts[0];
+        const id = parseInt(parts[1]);
+        
+        // Find the tab with this type and click it
+        const tab = document.querySelector(`.tab[data-type="${type}"]`);
+        if (tab) {
+            tab.click();
+            
+            // After content loads, find the item and show its detail
+            setTimeout(() => {
+                const item = currentData.find(item => item.id === id);
+                if (item && item.visible !== false) {
+                    showDetailView(item, type);
+                }
+            }, 500);
+        }
+    }
+});
+
+// Check for hash on page load
+window.addEventListener('load', () => {
+    const hash = window.location.hash.substring(1);
+    const parts = hash.split('/');
+    
+    if (parts.length === 2) {
+        const type = parts[0];
+        const id = parseInt(parts[1]);
+        
+        // Load the team data first, then the content type
+        fetchData('team').then(data => {
+            teamData = data.team || [];
+            
+            // Find the tab with this type and click it
+            const tab = document.querySelector(`.tab[data-type="${type}"]`);
+            if (tab) {
+                tab.click();
+                
+                // Load the specific content type
+                fetchData(type).then(data => {
+                    currentData = data[type] || [];
+                    
+                    // Find the item and show its detail
+                    const item = currentData.find(item => item.id === id);
+                    if (item && item.visible !== false) {
+                        showDetailView(item, type);
+                    }
+                });
+            }
+        });
+    }
+});
