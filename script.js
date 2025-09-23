@@ -27,11 +27,7 @@ contentContainer.className = 'content-container';
 contentEl.parentNode.insertBefore(contentContainer, contentEl);
 contentContainer.appendChild(contentEl);
 
-// Create footer
-const footer = document.createElement('div');
-footer.className = 'footer';
-footer.innerHTML = 'A PRODUCT OF LAG FF';
-contentContainer.parentNode.appendChild(footer);
+
 
 // Create scroll helper element
 scrollHelper.className = 'scroll-helper';
