@@ -39,7 +39,7 @@ document.body.appendChild(scrollHelper);
 
 // CORS proxy server
 const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
-const API_BASE = 'https://craftx-json-stored.vercel.app/view/';
+const API_BASE = 'https://json.craftx.site/view/';
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
