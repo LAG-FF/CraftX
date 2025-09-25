@@ -17,7 +17,7 @@ body::before {
     height: 100%;
     background: url(https://storage.craftx.site/f1/BG.jpg) no-repeat center center;
     background-size: cover;
-    opacity: 0.4;
+    opacity: 0.3;
     z-index: -1;
 }
 
@@ -30,7 +30,7 @@ body::before {
 }
 
 .top {
-    background: rgba(40, 40, 45, 0.9);
+    background: rgba(25, 25, 30, 0.95);
     border-radius: 20px;
     padding: 10px 16px;
     display: flex;
@@ -38,6 +38,7 @@ body::before {
     align-items: center;
     margin-bottom: 16px;
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .brand {
@@ -70,8 +71,8 @@ body::before {
 }
 
 .search-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     padding: 8px 15px;
     color: white;
@@ -89,8 +90,8 @@ body::before {
 }
 
 .search-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -126,21 +127,22 @@ body::before {
     text-align: center;
     padding: 8px;
     border-radius: 16px;
-    background: rgba(50, 50, 55, 0.8);
+    background: rgba(20, 20, 25, 0.9);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tab.active {
-    background: rgba(70, 70, 75, 0.9);
+    background: rgba(40, 40, 45, 0.95);
     font-weight: bold;
 }
 
 .tab:hover {
-    background: rgba(60, 60, 65, 0.9);
+    background: rgba(30, 30, 35, 0.95);
 }
 
 .content-container {
@@ -148,16 +150,17 @@ body::before {
 }
 
 .card {
-    background: rgba(45, 45, 50, 0.85);
+    background: rgba(30, 30, 35, 0.9);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     cursor: pointer;
     transform: translateY(30px);
     opacity: 0;
     transition: transform 0.2s ease, opacity 0.2s ease;
     -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .card.visible {
@@ -166,7 +169,8 @@ body::before {
 }
 
 .card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    background: rgba(35, 35, 40, 0.95);
 }
 
 .card-header {
@@ -177,7 +181,7 @@ body::before {
 }
 
 .user-badge {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.7);
     padding: 6px 12px;
     border-radius: 20px;
     display: flex;
@@ -187,6 +191,7 @@ body::before {
     overflow: hidden;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-icon {
@@ -205,8 +210,8 @@ body::before {
 }
 
 .share-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -224,7 +229,7 @@ body::before {
 }
 
 .preview {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 12px;
     height: 180px;
     display: flex;
@@ -233,6 +238,7 @@ body::before {
     font-size: 14px;
     margin-bottom: 12px;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .preview-img {
@@ -260,7 +266,7 @@ body::before {
 }
 
 .page {
-    background: rgba(50, 50, 55, 0.8);
+    background: rgba(20, 20, 25, 0.9);
     padding: 8px 12px;
     border-radius: 12px;
     cursor: pointer;
@@ -269,22 +275,23 @@ body::before {
     transition: all 0.3s ease;
     min-width: 40px;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .page.active {
-    background: rgba(70, 70, 75, 0.9);
+    background: rgba(40, 40, 45, 0.95);
     font-weight: bold;
 }
 
 .page:hover {
-    background: rgba(60, 60, 65, 0.9);
+    background: rgba(30, 30, 35, 0.95);
 }
 
 .footer {
     text-align: center;
     padding: 30px 0 20px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     transition: opacity 0.3s ease;
 }
@@ -300,7 +307,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.98);
     z-index: 1000;
     overflow-y: auto;
     padding: 20px;
@@ -311,7 +318,7 @@ body::before {
 .detail-content {
     max-width: 500px;
     margin: 40px auto;
-    background: rgba(50, 50, 55, 0.95);
+    background: rgba(25, 25, 30, 0.98);
     border-radius: 20px;
     padding: 25px;
     position: relative;
@@ -320,6 +327,7 @@ body::before {
     transform: scale(0.9);
     opacity: 0;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .detail-content.open {
@@ -342,8 +350,8 @@ body::before {
 }
 
 .close-detail-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -361,8 +369,8 @@ body::before {
 }
 
 .detail-share-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     width: 36px;
     height: 36px;
@@ -385,6 +393,7 @@ body::before {
     margin-bottom: 20px;
     max-height: 300px;
     object-fit: contain;
+    background: rgba(0, 0, 0, 0.9);
 }
 
 .detail-title {
@@ -402,6 +411,7 @@ body::before {
     word-break: break-word;
     text-align: center;
     padding: 0 10px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .action-buttons {
@@ -416,7 +426,7 @@ body::before {
     font-size: 16px;
     font-weight: bold;
     margin: 15px 0 8px;
-    color: #fff;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .action-btn {
@@ -429,16 +439,18 @@ body::before {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: rgba(60, 60, 65, 0.9);
+    background: rgba(0, 0, 0, 0.9);
     color: #fff;
     font-weight: bold;
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .action-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    background: rgba(10, 10, 15, 0.95);
 }
 
 .action-btn:active {
@@ -451,12 +463,12 @@ body::before {
 }
 
 .youtube-btn {
-    background: #d32f2f;
+    background: #b71c1c;
     color: white;
 }
 
 .link-btn, .tool-btn, .other-btn {
-    background: rgba(60, 60, 65, 0.9);
+    background: rgba(0, 0, 0, 0.9);
     color: #fff;
 }
 
@@ -464,6 +476,7 @@ body::before {
     text-align: center;
     padding: 40px 20px;
     font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .error {
@@ -486,7 +499,7 @@ body::before {
     right: 20px;
     width: 40px;
     height: 40px;
-    background: rgba(60, 60, 65, 0.9);
+    background: rgba(0, 0, 0, 0.9);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -496,6 +509,7 @@ body::before {
     opacity: 0;
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .scroll-helper.visible {
