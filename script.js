@@ -335,9 +335,9 @@ function showDetailView(item, type) {
     
     if (type === 'map' || type === 'asset') {
         // Map and asset codes for India
-        if (item.map_code_ind && item.map_code_ind.length > 0) {
+        if (item.code_ind && item.code_ind.length > 0) {
             indiaCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For India Server' : 'Asset Code For India Server'}</div>`;
-            item.map_code_ind.forEach(code => {
+            item.code_ind.forEach(code => {
                 indiaCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
                         <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
@@ -347,9 +347,9 @@ function showDetailView(item, type) {
         }
         
         // Map and asset codes for Other regions
-        if (item.map_code_other && item.map_code_other.length > 0) {
+        if (item.code_other && item.code_other.length > 0) {
             otherCodesHTML = `<div class="code-section-title">${type === 'map' ? 'Map Code For Other Server' : 'Asset Code For Other Server'}</div>`;
-            item.map_code_other.forEach(code => {
+            item.code_other.forEach(code => {
                 otherCodesHTML += `
                     <button class="action-btn code-btn" onclick="copyToClipboard('${code.code}')">
                         <img src="https://storage.craftx.site/f1/Copy.png" alt="Copy"> ${code.name}
@@ -360,7 +360,7 @@ function showDetailView(item, type) {
         
         buttonsHTML = indiaCodesHTML + otherCodesHTML;
     } else if (item.button_links && item.button_links.length > 0) {
-        // Other button links - use dark color for tools and others
+        // Other button links
         const buttonClass = type === 'tool' ? 'tool-btn' : 'other-btn';
         item.button_links.forEach(link => {
             if (link.type === 'download file') {
